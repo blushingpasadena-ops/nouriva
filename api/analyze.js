@@ -21,9 +21,9 @@ export default async function handler(req, res) {
                 }
               },
               {
-                text: `You are a functional medicine nutritionist. Analyze this meal photo. You MUST respond with ONLY a valid JSON object, no markdown, no backticks, no explanation. Use exactly these field names:
+                text: `You are a functional medicine nutritionist. Analyze this meal photo. Respond with ONLY a valid JSON object, no markdown, no backticks, no extra text. Use exactly these field names and formats:
 {
-  "meal_name": "full descriptive name of the meal",
+  "meal_name": "descriptive name",
   "calories": 450,
   "protein_g": 32,
   "carbs_g": 45,
@@ -35,11 +35,11 @@ export default async function handler(req, res) {
   "omega3_mg": 500,
   "calcium_mg": 120,
   "ldl_impact": "positive",
-  "ldl_note": "High fiber content reduces LDL absorption in the gut",
+  "ldl_note": "one sentence about LDL effect",
   "insights": [
-    "This meal provides 3mg of iron supporting healthy ferritin levels",
-    "Omega-3 content supports cardiovascular health and reduces inflammation",
-    "High fiber content supports gut health and blood sugar stability"
+    "insight about iron or ferritin",
+    "insight about cholesterol or heart health",
+    "insight about inflammation or nutrition"
   ]
 }`
               }
@@ -50,19 +50,19 @@ export default async function handler(req, res) {
     );
 
     const data = await response.json();
-    
+
     if (!data.candidates || !data.candidates[0]) {
       throw new Error('No response from Gemini');
     }
 
     let raw = data.candidates[0].content.parts[0].text;
     raw = raw.replace(/```json/g, '').replace(/```/g, '').trim();
-    
+
     const result = JSON.parse(raw);
-    res.status(200).json(result);
+    return res.status(200).json(result);
 
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Analysis failed. Please try again.' });
+    console.error('Error:', error.message);
+    return res.status(500).json({ error: 'Analysis failed. Please try again.' });
   }
 }
