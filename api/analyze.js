@@ -21,30 +21,26 @@ export default async function handler(req, res) {
                 }
               },
               {
-                text: `You are a functional medicine nutritionist specializing in longevity, hormonal health, and ethnic cuisines. Analyze this meal photo carefully and identify every component you can see. Respond ONLY with valid JSON — no markdown, no preamble:
+                text: `You are a functional medicine nutritionist. Analyze this meal photo. You MUST respond with ONLY a valid JSON object, no markdown, no backticks, no explanation. Use exactly these field names:
 {
-  "meal_name": "descriptive name of what you see",
-  "calories": number,
-  "protein_g": number,
-  "carbs_g": number,
-  "fat_g": number,
-  "fiber_g": number,
-  "sugar_g": number,
-  "sodium_mg": number,
-  "iron_mg": number,
-  "omega3_mg": number,
-  "calcium_mg": number,
-  "ldl_impact": "positive or neutral or negative",
-  "ldl_note": "one sentence about this meal's effect on LDL",
-  "hormone_impact": "one sentence on how this affects estrogen, testosterone, insulin, or cortisol",
-  "longevity_score": number from 1 to 10,
-  "inflammation_rating": "low or moderate or high",
+  "meal_name": "full descriptive name of the meal",
+  "calories": 450,
+  "protein_g": 32,
+  "carbs_g": 45,
+  "fat_g": 12,
+  "fiber_g": 6,
+  "sugar_g": 8,
+  "sodium_mg": 420,
+  "iron_mg": 3,
+  "omega3_mg": 500,
+  "calcium_mg": 120,
+  "ldl_impact": "positive",
+  "ldl_note": "High fiber content reduces LDL absorption in the gut",
   "insights": [
-    "insight about iron or ferritin impact",
-    "insight about cholesterol or cardiovascular health",
-    "insight about inflammation or overall nutrition"
-  ],
-  "suggestion": "one warm encouraging tip to make this meal even more supportive of their health"
+    "This meal provides 3mg of iron supporting healthy ferritin levels",
+    "Omega-3 content supports cardiovascular health and reduces inflammation",
+    "High fiber content supports gut health and blood sugar stability"
+  ]
 }`
               }
             ]
@@ -54,14 +50,19 @@ export default async function handler(req, res) {
     );
 
     const data = await response.json();
-    const raw = (data.candidates?.[0]?.content?.parts?.[0]?.text || '{}')
-      .replace(/```json|```/g, '')
-      .trim();
+    
+    if (!data.candidates || !data.candidates[0]) {
+      throw new Error('No response from Gemini');
+    }
 
+    let raw = data.candidates[0].content.parts[0].text;
+    raw = raw.replace(/```json/g, '').replace(/```/g, '').trim();
+    
     const result = JSON.parse(raw);
     res.status(200).json(result);
 
   } catch (error) {
+    console.error('Error:', error);
     res.status(500).json({ error: 'Analysis failed. Please try again.' });
   }
 }
