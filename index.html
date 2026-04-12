@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nouriva — Your Health, Reclaimed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --ink:#0f0f0f;--ink2:#2e2e2e;--ink3:#5a5a5a;--ink4:#9a9a9a;
+  --rule:#e6e3de;--rule2:#f2efe9;--cream:#faf7f2;--paper:#ffffff;
+  --sage:#3d6b4f;--sage2:#5a8f6a;--sage3:#b8d4bf;--sage4:#eaf3ec;
+  --amber:#b8742a;--amber2:#f0d5a0;--rose:#b85252;--rose2:#f5cfcf;
+  --teal:#2a7a8a;--teal2:#d0eef2;
+  --r:14px;
+  --sh:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.05);
+  --sh-lg:0 2px 8px rgba(0,0,0,.08),0 20px 60px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;font-size:16px}
+body{font-family:'Geist',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+.hidden{display:none!important}
+
+.landing{display:flex;flex-direction:column;min-height:100vh;background:var(--cream)}
+.l-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:rgba(250,247,242,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:100}
+.v-logo{font-family:'Cormorant Garamond',serif;font-size:24px;letter-spacing:-.3px;color:var(--ink)}
+.v-logo span{color:var(--sage)}
+.l-nav-btns{display:flex;gap:8px}
+.btn-o{padding:9px 18px;border-radius:10px;border:1.5px solid var(--rule);background:transparent;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:'Geist',sans-serif;transition:.15s}
+.btn-o:hover{border-color:var(--ink3)}
+.btn-f{padding:9px 20px;border-radius:10px;border:none;background:var(--sage);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;transition:.15s}
+.btn-f:hover{background:var(--sage2)}
+
+.hero{max-width:700px;margin:0 auto;padding:90px 32px 60px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--sage4);border:1px solid var(--sage3);color:var(--sage);font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;margin-bottom:28px;letter-spacing:.4px}
+h1.hero-h{font-family:'Cormorant Garamond',serif;font-size:clamp(44px,7vw,72px);line-height:1.03;letter-spacing:-2px;color:var(--ink);margin-bottom:22px}
+h1.hero-h em{font-style:italic;color:var(--sage)}
+.hero-p{font-size:17px;color:var(--ink3);line-height:1.7;margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-hero-p{padding:15px 30px;border-radius:14px;border:none;background:var(--ink);color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;transition:all .2s}
+.btn-hero-p:hover{background:var(--ink2);transform:translateY(-1px)}
+.btn-hero-s{padding:15px 26px;border-radius:14px;border:1.5px solid var(--rule);background:white;color:var(--ink);font-size:15px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;transition:.15s}
+.btn-hero-s:hover{border-color:var(--ink3)}
+.hero-note{font-size:13px;color:var(--ink4);margin-top:16px}
+
+.for-whom{max-width:840px;margin:0 auto;padding:20px 32px 60px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:640px){.for-whom{grid-template-columns:1fr}}
+.for-card{background:white;border:1px solid var(--rule);border-radius:var(--r);padding:24px;box-shadow:var(--sh)}
+.for-icon{font-size:28px;margin-bottom:12px}
+.for-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.for-desc{font-size:13px;color:var(--ink3);line-height:1.6}
+
+.preview-wrap{max-width:860px;margin:0 auto;padding:0 32px 60px}
+.preview-label{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--ink4);text-transform:uppercase;text-align:center;margin-bottom:20px}
+.preview-frame{background:white;border:1px solid var(--rule);border-radius:22px;overflow:hidden;box-shadow:var(--sh-lg)}
+.pf-bar{background:var(--ink);padding:14px 20px;display:flex;align-items:center;gap:10px}
+.pf-dots{display:flex;gap:5px}
+.pf-dot{width:9px;height:9px;border-radius:50%}
+.pf-url{font-size:11px;color:rgba(255,255,255,.35);flex:1;text-align:center;letter-spacing:.5px}
+.pf-body{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.pf-body{grid-template-columns:1fr}}
+.pf-habits{display:flex;flex-direction:column;gap:8px}
+.pf-habit{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:var(--rule2)}
+.pf-habit.done{background:var(--sage4)}
+.pf-chk{width:20px;height:20px;border-radius:50%;border:2px solid var(--rule);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.pf-habit.done .pf-chk{background:var(--sage);border-color:var(--sage);color:white}
+.pf-hname{font-size:12px;font-weight:500;flex:1}
+.pf-habit.done .pf-hname{color:var(--sage)}
+.pf-str{font-size:10px;color:var(--amber);font-weight:700}
+.pf-stats{display:flex;flex-direction:column;gap:8px}
+.pf-stat{background:var(--rule2);border-radius:10px;padding:14px;text-align:center}
+.pf-sv{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--ink)}
+.pf-sl{font-size:10px;color:var(--ink4);font-weight:600;margin-top:2px}
+
+.demo-wrap{max-width:680px;margin:0 auto;padding:0 32px 60px}
+.demo-card{background:white;border:1px solid var(--rule);border-radius:20px;padding:28px;box-shadow:var(--sh)}
+.demo-badge{display:inline-flex;align-items:center;gap:5px;background:var(--amber2);color:var(--amber);font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;margin-bottom:14px}
+.upload-z{border:2px dashed var(--rule);border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:.2s;background:var(--rule2);position:relative;overflow:hidden}
+.upload-z:hover{border-color:var(--sage3);background:var(--sage4)}
+.upload-z input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.u-icon{font-size:32px;margin-bottom:10px}
+.u-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.u-sub{font-size:12px;color:var(--ink4)}
+.ana-bar{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(--sage4);border-radius:10px;margin-top:14px}
+.ana-bar.on{display:flex}
+.spin{animation:sp 1s linear infinite;display:inline-block;font-size:15px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.meal-out{display:none;margin-top:18px}
+.meal-out.on{display:block}
+.m-img{width:100%;border-radius:12px;max-height:180px;object-fit:cover;margin-bottom:14px}
+.m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.m-box{background:var(--rule2);border-radius:10px;padding:11px;text-align:center}
+.m-val{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ink)}
+.m-unit{font-size:10px;color:var(--ink4);font-weight:600;text-transform:uppercase}
+.m-insights{background:var(--sage4);border-radius:12px;padding:14px}
+.m-i-title{font-size:11px;font-weight:700;color:var(--sage);letter-spacing:.6px;margin-bottom:10px}
+.m-i-item{font-size:12px;color:var(--ink2);padding:5px 0;border-bottom:1px solid var(--sage3);display:flex;gap:7px;line-height:1.5}
+.m-i-item:last-child{border-bottom:none}
+.ldl-tag{display:inline-flex;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;margin-bottom:10px}
+.ldl-pos{background:var(--sage4);color:var(--sage)}
+.ldl-neg{background:var(--rose2);color:var(--rose)}
+.ldl-neu{background:var(--rule2);color:var(--ink3)}
+.cta-box{margin-top:14px;background:var(--ink);border-radius:12px;padding:16px;text-align:center}
+.cta-box p{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:10px}
+.cta-box button{background:white;color:var(--ink);border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Geist',sans-serif}
+
+.price-wrap{max-width:480px;margin:0 auto;padding:20px 32px 80px;text-align:center}
+.price-label{font-size:12px;font-weight:600;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px}
+.price-h{font-family:'Cormorant Garamond',serif;font-size:38px;letter-spacing:-1px;color:var(--ink);margin-bottom:10px}
+.price-p{font-size:14px;color:var(--ink3);margin-bottom:32px;line-height:1.6}
+.price-card{background:white;border:2px solid var(--sage);border-radius:22px;padding:36px;box-shadow:var(--sh-lg)}
+.price-amt{font-family:'Cormorant Garamond',serif;font-size:60px;color:var(--ink);letter-spacing:-2px;line-height:1}
+.price-per{font-size:15px;color:var(--ink3);margin-bottom:26px}
+.price-feats{text-align:left;margin-bottom:26px;display:flex;flex-direction:column;gap:10px}
+.price-feat{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink2);line-height:1.5}
+.pf-check{color:var(--sage);flex-shrink:0;font-size:15px;margin-top:1px}
+.stripe-cta{width:100%;padding:16px;border-radius:12px;border:none;background:var(--sage);color:white;font-size:15px;font-weight:700;cursor:pointer;font-family:'Geist',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.stripe-cta:hover{background:var(--sage2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(61,107,79,.25)}
+.stripe-note{font-size:12px;color:var(--ink4);margin-top:10px}
+
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--cream);padding:20px}
+.auth-box{background:var(--paper);border:1px solid var(--rule);border-radius:22px;padding:44px 38px;width:100%;max-width:400px;box-shadow:var(--sh-lg)}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--ink);margin-bottom:6px;letter-spacing:-.3px}
+.auth-logo span{color:var(--sage)}
+.auth-sub{font-size:13px;color:var(--ink3);margin-bottom:32px;line-height:1.5}
+.auth-tabs{display:flex;background:var(--rule2);border-radius:10px;padding:3px;margin-bottom:26px}
+.a-tab{flex:1;padding:8px;border-radius:8px;border:none;background:none;font-size:13px;font-weight:600;color:var(--ink4);cursor:pointer;transition:.15s;font-family:'Geist',sans-serif}
+.a-tab.on{background:white;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:5px;letter-spacing:.3px}
+.fld input,.fld select{width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none;transition:.2s}
+.fld input:focus,.fld select:focus{border-color:var(--sage);background:white}
+.a-submit{width:100%;padding:13px;border-radius:11px;border:none;background:var(--ink);color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;transition:.2s;margin-top:6px}
+.a-submit:hover{background:var(--ink2)}
+.a-divider{text-align:center;font-size:12px;color:var(--ink4);margin:18px 0;position:relative}
+.a-divider::before,.a-divider::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--rule)}
+.a-divider::before{left:0}.a-divider::after{right:0}
+.a-err{background:var(--rose2);color:var(--rose);font-size:12px;padding:9px 13px;border-radius:8px;margin-bottom:14px;border:1px solid #f0c0c0}
+
+.app{display:none;min-height:100vh}
+.app.on{display:flex;flex-direction:column}
+.sidebar{width:232px;background:var(--paper);border-right:1px solid var(--rule);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;overflow:hidden}
+.main-content{margin-left:232px;flex:1;min-height:100vh;padding:44px 38px}
+@media(max-width:780px){
+.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid var(--rule);flex-direction:row;align-items:center;padding:10px 14px;gap:10px}
+.main-content{margin-left:0;padding:18px 14px 80px}
+.s-nav{display:flex!important;flex-direction:row;gap:4px;flex:1;overflow-x:auto}
+.s-nav .ni{flex-direction:row;gap:5px;padding:7px 10px;font-size:12px;white-space:nowrap}
+.s-logo,.s-user,.s-up{display:none!important}
+}
+.s-logo{padding:26px 22px 18px;border-bottom:1px solid var(--rule2)}
+.s-logo-mark{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ink);letter-spacing:-.3px}
+.s-logo-mark span{color:var(--sage)}
+.s-logo-sub{font-size:10px;color:var(--ink4);letter-spacing:.8px;margin-top:3px;font-weight:600;text-transform:uppercase}
+.s-nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:all .15s;font-size:14px;font-weight:500;color:var(--ink3);border:none;background:none;width:100%;text-align:left;font-family:'Geist',sans-serif}
+.ni:hover{background:var(--rule2);color:var(--ink)}
+.ni.on{background:var(--sage4);color:var(--sage)}
+.ni-icon{font-size:16px;width:20px;text-align:center}
+.ni-label{flex:1}
+.ni-badge{background:var(--sage);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px}
+.s-user{margin:0 10px;padding:13px;border-radius:12px;background:var(--rule2);cursor:pointer;transition:.15s}
+.s-user:hover{background:var(--rule)}
+.s-uname{font-size:13px;font-weight:600;color:var(--ink)}
+.s-uemail{font-size:11px;color:var(--ink4);margin-top:1px}
+.s-up{margin:10px;padding:15px;border-radius:14px;background:linear-gradient(135deg,var(--sage),var(--sage2));color:white}
+.s-up-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.s-up-desc{font-size:11px;opacity:.8;margin-bottom:11px;line-height:1.5}
+.s-up-btn{width:100%;padding:8px;border-radius:8px;border:none;background:white;color:var(--sage);font-size:12px;font-weight:700;cursor:pointer;font-family:'Geist',sans-serif}
+
+.pg-head{margin-bottom:32px}
+.pg-title{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:-1px;color:var(--ink);margin-bottom:3px}
+.pg-sub{font-size:13px;color:var(--ink4)}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink4);margin-bottom:12px}
+
+.stats-r{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+@media(max-width:560px){.stats-r{grid-template-columns:repeat(2,1fr)}.stats-r .sc:last-child{grid-column:1/-1}}
+.sc{background:white;border:1px solid var(--rule);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.sc-val{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--ink);line-height:1;margin-bottom:3px}
+.sc-lbl{font-size:11px;color:var(--ink4);font-weight:600;letter-spacing:.3px}
+.sc-sub{font-size:11px;color:var(--sage);margin-top:3px;font-weight:500}
+
+.habits-l{display:flex;flex-direction:column;gap:7px;margin-bottom:28px}
+.h-row{background:white;border:1px solid var(--rule);border-radius:13px;padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;user-select:none}
+.h-row:hover{box-shadow:var(--sh)}
+.h-row.done{background:var(--sage4);border-color:var(--sage3)}
+.h-chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--rule);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;font-size:11px;color:transparent}
+.h-row.done .h-chk{background:var(--sage);border-color:var(--sage);color:white;transform:scale(1.1)}
+.h-icon{font-size:17px;flex-shrink:0}
+.h-info{flex:1;min-width:0}
+.h-name{font-size:14px;font-weight:500;color:var(--ink)}
+.h-row.done .h-name{color:var(--sage)}
+.h-meta{font-size:11px;color:var(--ink4);margin-top:1px}
+.h-streak{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--amber);background:var(--amber2);padding:2px 7px;border-radius:7px;flex-shrink:0}
+.h-acts{opacity:0;transition:.15s}
+.h-row:hover .h-acts{opacity:1}
+.h-del{width:24px;height:24px;border-radius:7px;border:none;background:var(--rose2);color:var(--rose);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.h-del:hover{background:var(--rose);color:white}
+.add-area{background:white;border:1.5px dashed var(--rule);border-radius:14px;padding:20px;margin-bottom:28px}
+.add-row{display:flex;gap:8px;align-items:stretch}
+.icon-sel{width:42px;min-width:42px;border:1.5px solid var(--rule);border-radius:10px;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:var(--rule2)}
+.icon-pop{position:absolute;top:46px;left:0;background:white;border:1px solid var(--rule);border-radius:12px;padding:10px;display:none;grid-template-columns:repeat(6,1fr);gap:5px;box-shadow:var(--sh-lg);z-index:100;min-width:220px}
+.icon-pop.on{display:grid}
+.i-opt{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;font-size:16px;transition:.1s}
+.i-opt:hover{background:var(--rule2)}
+.h-inp{flex:1;padding:10px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none;transition:.2s}
+.h-inp:focus{border-color:var(--sage);background:white}
+.add-btn{padding:10px 18px;border-radius:10px;border:none;background:var(--ink);color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif;white-space:nowrap}
+.add-btn:hover{background:var(--ink2)}
+
+.exercise-section{background:white;border:1px solid var(--rule);border-radius:14px;padding:20px;margin-bottom:28px;box-shadow:var(--sh)}
+.ex-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+@media(max-width:500px){.ex-grid{grid-template-columns:repeat(3,1fr)}}
+.ex-chip{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:10px;border:1.5px solid var(--rule);background:var(--rule2);cursor:pointer;transition:all .2s;font-family:'Geist',sans-serif}
+.ex-chip:hover{border-color:var(--sage3);background:var(--sage4)}
+.ex-chip.sel{border-color:var(--sage);background:var(--sage4);color:var(--sage)}
+.ex-chip-icon{font-size:20px}
+.ex-chip-label{font-size:10px;font-weight:600;color:var(--ink3);text-align:center}
+.ex-chip.sel .ex-chip-label{color:var(--sage)}
+.ex-protocol{margin-top:14px;background:var(--sage4);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--sage);font-weight:500;line-height:1.6;display:none}
+.ex-protocol.on{display:block}
+.chart-card{background:white;border:1px solid var(--rule);border-radius:var(--r);padding:22px;box-shadow:var(--sh);margin-bottom:20px}
+.chart-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.chart-title{font-size:14px;font-weight:600;color:var(--ink)}
+.chart-period{font-size:12px;color:var(--ink4)}
+
+.meal-up{border:2px dashed var(--rule);border-radius:14px;padding:44px 20px;text-align:center;cursor:pointer;transition:.2s;background:white;position:relative;overflow:hidden;margin-bottom:20px}
+.meal-up:hover{border-color:var(--sage3);background:var(--sage4)}
+.meal-up input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.meal-entries-l{display:flex;flex-direction:column;gap:9px}
+.me-card{background:white;border:1px solid var(--rule);border-radius:13px;padding:16px 18px;box-shadow:var(--sh)}
+.me-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.me-name{font-size:14px;font-weight:600;color:var(--ink)}
+.me-time{font-size:11px;color:var(--ink4)}
+.me-cals{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ink)}
+.me-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.pill{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:var(--rule2);color:var(--ink2)}
+.pill-ldl-pos{background:var(--sage4);color:var(--sage)}
+.pill-ldl-neg{background:var(--rose2);color:var(--rose)}
+.me-note{margin-top:9px;font-size:12px;color:var(--ink3);line-height:1.5;padding:9px 11px;background:var(--rule2);border-radius:8px}
+
+.prof-card{background:white;border:1px solid var(--rule);border-radius:var(--r);padding:22px;box-shadow:var(--sh);margin-bottom:14px}
+.prof-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--sage),var(--sage2));display:flex;align-items:center;justify-content:center;color:white;margin-bottom:14px;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600}
+.sub-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:16px;margin-bottom:14px}
+.sub-pro{background:var(--sage4);color:var(--sage)}
+.sub-free{background:var(--amber2);color:var(--amber)}
+.sign-out{width:100%;padding:11px;border-radius:10px;border:1.5px solid var(--rule);background:transparent;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink3);font-family:'Geist',sans-serif;transition:.15s}
+.sign-out:hover{border-color:var(--rose);color:var(--rose)}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.on{display:flex}
+.modal{background:white;border-radius:22px;padding:34px;max-width:400px;width:100%;box-shadow:var(--sh-lg)}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--ink);margin-bottom:6px}
+.modal-body{font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:20px}
+.modal-acts{display:flex;gap:10px}
+.modal-ok{flex:1;padding:12px;border-radius:10px;border:none;background:var(--sage);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'Geist',sans-serif}
+.modal-no{padding:12px 18px;border-radius:10px;border:1.5px solid var(--rule);background:transparent;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink3);font-family:'Geist',sans-serif}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--ink);color:white;padding:11px 18px;border-radius:11px;font-size:13px;font-weight:500;z-index:300;opacity:0;transform:translateY(6px);transition:all .25s;pointer-events:none}
+.toast.on{opacity:1;transform:translateY(0)}
+.ana-bar-app{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(--sage4);border-radius:10px;margin-bottom:14px}
+.ana-bar-app.on{display:flex}
+</style>
+</head>
+<body>
+
+<div id="landing" class="landing">
+  <nav class="l-nav">
+    <div class="v-logo">Nouri<span>va</span></div>
+    <div class="l-nav-btns">
+      <button class="btn-o" onclick="showAuth('login')">Sign in</button>
+      <button class="btn-f" onclick="showAuth('signup')">Start free →</button>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="eyebrow">✦ Built for your lab results</div>
+    <h1 class="hero-h">Your health,<br/><em>reclaimed.</em></h1>
+    <p class="hero-p">Turn abnormal lab findings into daily action. Track habits, log meals, and build the lifestyle your body is asking for — one day at a time.</p>
+    <div class="hero-btns">
+      <button class="btn-hero-p" onclick="showAuth('signup')">Start free trial</button>
+      <button class="btn-hero-s" onclick="document.getElementById('demo-anchor').scrollIntoView({behavior:'smooth'})">Try meal analysis ↓</button>
+    </div>
+    <p class="hero-note">14-day free trial · $9.99/mo after · cancel anytime</p>
+  </div>
+  <div class="for-whom">
+    <div class="for-card"><div class="for-icon">🧪</div><div class="for-title">Your labs came back flagged</div><div class="for-desc">High LDL, low ferritin, pre-diabetes markers — Nouriva translates results into daily habits and foods that actually move the needle.</div></div>
+    <div class="for-card"><div class="for-icon">🌿</div><div class="for-title">You want food as medicine</div><div class="for-desc">Snap a photo of any meal — our AI breaks down every macro, flags LDL impact, and ties it to your specific lab concerns.</div></div>
+    <div class="for-card"><div class="for-icon">📈</div><div class="for-title">You need accountability</div><div class="for-desc">Streaks, progress charts, and a supplement timing system make it easy to stay consistent — even on your busiest days.</div></div>
+  </div>
+  <div class="preview-wrap">
+    <div class="preview-label">What it looks like inside</div>
+    <div class="preview-frame">
+      <div class="pf-bar"><div class="pf-dots"><div class="pf-dot" style="background:#ff5f57"></div><div class="pf-dot" style="background:#febc2e"></div><div class="pf-dot" style="background:#28c840"></div></div><div class="pf-url">nouriva.app — Today's Habits</div><div style="width:46px"></div></div>
+      <div class="pf-body">
+        <div class="pf-habits">
+          <div class="pf-habit done"><div class="pf-chk">✓</div><span class="pf-hname">Iron supplement + vitamin C</span><span class="pf-str">🔥 14</span></div>
+          <div class="pf-habit done"><div class="pf-chk">✓</div><span class="pf-hname">Fatty fish or omega-3</span><span class="pf-str">🔥 9</span></div>
+          <div class="pf-habit"><div class="pf-chk"></div><span class="pf-hname">Evening walk / yoga</span><span class="pf-str" style="color:var(--ink4)">5d</span></div>
+          <div class="pf-habit"><div class="pf-chk"></div><span class="pf-hname">Barley-rice blend at dinner</span><span class="pf-str" style="color:var(--ink4)">12d</span></div>
+          <div class="pf-habit done"><div class="pf-chk">✓</div><span class="pf-hname">Magnesium before bed</span><span class="pf-str">🔥 21</span></div>
+        </div>
+        <div class="pf-stats">
+          <div class="pf-stat"><div class="pf-sv">87%</div><div class="pf-sl">This week</div></div>
+          <div class="pf-stat"><div class="pf-sv">21</div><div class="pf-sl">Best streak</div></div>
+          <div class="pf-stat"><div class="pf-sv">38</div><div class="pf-sl">Days active</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="demo-anchor" class="demo-wrap">
+    <div style="text-align:center;margin-bottom:20px">
+      <div class="demo-badge">✦ Free preview — try it now</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--ink);margin-bottom:8px;letter-spacing:-.5px">AI Meal Analysis</h2>
+      <p style="font-size:14px;color:var(--ink3);max-width:420px;margin:0 auto;line-height:1.6">Snap or upload any meal photo. Real AI identifies exactly what you're eating and gives you a full nutritional breakdown.</p>
+    </div>
+    <div class="demo-card">
+      <div class="upload-z" id="landingZone">
+        <input type="file" accept="image/*" onchange="runLandingAnalysis(this)"/>
+        <div class="u-icon">📸</div>
+        <div class="u-title">Tap to upload a meal photo</div>
+        <div class="u-sub">Works with any food — Japanese, Korean, Chinese, Mediterranean, anything</div>
+      </div>
+      <div class="ana-bar" id="landingAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">AI is analyzing your meal…</span></div>
+      <div class="meal-out" id="landingOut">
+        <img id="landingImg" class="m-img" src="" alt="meal"/>
+        <div id="landingMacros" class="m-grid"></div>
+        <div id="landingInsights" class="m-insights"></div>
+        <div class="cta-box"><p>Track this + all your habits and meals every day</p><button onclick="showAuth('signup')">Create your free account →</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="price-wrap">
+    <div class="price-label">Simple pricing</div>
+    <h2 class="price-h">One plan. Everything included.</h2>
+    <p class="price-p">No tiers, no upsells. Cancel anytime.</p>
+    <div class="price-card">
+      <div class="price-amt">$9<span style="font-size:28px">.99</span></div>
+      <div class="price-per">per month</div>
+      <div class="price-feats">
+        <div class="price-feat"><span class="pf-check">✦</span>Unlimited habits with streak tracking</div>
+        <div class="price-feat"><span class="pf-check">✦</span>AI meal photo analysis — calories, macros, LDL impact</div>
+        <div class="price-feat"><span class="pf-check">✦</span>Lab-linked nutrition insights</div>
+        <div class="price-feat"><span class="pf-check">✦</span>Exercise protocol generator</div>
+        <div class="price-feat"><span class="pf-check">✦</span>Weekly progress charts & streak history</div>
+        <div class="price-feat"><span class="pf-check">✦</span>Supplement timing guide</div>
+        <div class="price-feat"><span class="pf-check">✦</span>Cycle & hormone nutrition guide</div>
+      </div>
+      <button class="stripe-cta" onclick="showStripeModal()">🔒 Subscribe — $9.99/month</button>
+      <p class="stripe-note">Secure payment via Stripe · Cancel anytime · 14-day free trial</p>
+    </div>
+  </div>
+  <div style="text-align:center;padding:32px;font-size:12px;color:var(--ink4);border-top:1px solid var(--rule)">© 2026 Nouriva Health · <a href="#" style="color:var(--ink4)">Privacy</a> · <a href="#" style="color:var(--ink4)">Terms</a></div>
+</div>
+
+<div id="authScreen" class="auth-screen hidden">
+  <div class="auth-box">
+    <div class="auth-logo">Nouri<span>va</span></div>
+    <p class="auth-sub">Your personal health OS — built around your lab results.</p>
+    <div class="auth-tabs">
+      <button class="a-tab on" id="aTabLogin" onclick="switchTab('login')">Sign in</button>
+      <button class="a-tab" id="aTabSignup" onclick="switchTab('signup')">Create account</button>
+    </div>
+    <div id="aErr" class="a-err hidden"></div>
+    <div id="loginForm">
+      <div class="fld"><label>Email</label><input type="email" id="lEmail" placeholder="you@example.com"/></div>
+      <div class="fld"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="a-submit" onclick="doLogin()">Sign in →</button>
+    </div>
+    <div id="signupForm" class="hidden">
+      <div class="fld"><label>Full name</label><input type="text" id="sName" placeholder="Your name"/></div>
+      <div class="fld"><label>Email</label><input type="email" id="sEmail" placeholder="you@example.com"/></div>
+      <div class="fld"><label>Password</label><input type="password" id="sPass" placeholder="At least 8 characters" onkeydown="if(event.key==='Enter')doSignup()"/></div>
+      <button class="a-submit" onclick="doSignup()">Create account →</button>
+    </div>
+    <div class="a-divider">or</div>
+    <button class="btn-o" style="width:100%;padding:11px;border-radius:10px;font-size:13px" onclick="doGuest()">Continue as guest (demo)</button>
+    <p style="font-size:12px;color:var(--ink4);text-align:center;margin-top:14px"><a href="#" style="color:var(--ink4)" onclick="showLanding();return false">← Back to home</a></p>
+  </div>
+</div>
+
+<div id="mainApp" class="app">
+  <div class="sidebar">
+    <div class="s-logo"><div class="s-logo-mark">Nouri<span>va</span></div><div class="s-logo-sub">Health OS</div></div>
+    <div class="s-nav">
+      <button class="ni on" onclick="goTab('habits',this)"><span class="ni-icon">✦</span><span class="ni-label">Habits</span><span class="ni-badge" id="todayBadge">0</span></button>
+      <button class="ni" onclick="goTab('exercise',this)"><span class="ni-icon">🏃</span><span class="ni-label">Exercise</span></button>
+      <button class="ni" onclick="goTab('progress',this)"><span class="ni-icon">📈</span><span class="ni-label">Progress</span></button>
+      <button class="ni" onclick="goTab('meals',this)"><span class="ni-icon">🍱</span><span class="ni-label">Meal Log</span></button>
+      <button class="ni" onclick="goTab('profile',this)"><span class="ni-icon">⚙️</span><span class="ni-label">Profile</span></button>
+    </div>
+    <div class="s-user" onclick="goTab('profile',null)"><div class="s-uname" id="sUserName">—</div><div class="s-uemail" id="sUserEmail">—</div></div>
+    <div class="s-up" id="upgradePanel"><div class="s-up-title">Upgrade to Pro</div><div class="s-up-desc">Unlock full meal AI, history & charts.</div><button class="s-up-btn" onclick="showStripeModal()">$9.99/mo →</button></div>
+  </div>
+  <div class="main-content">
+    <div id="tab-habits">
+      <div class="pg-head"><div class="pg-title" id="pgTitle">Today</div><div class="pg-sub" id="pgDate"></div></div>
+      <div class="stats-r">
+        <div class="sc"><div class="sc-val" id="sCom">0/0</div><div class="sc-lbl">Today</div><div class="sc-sub" id="sPct">—% done</div></div>
+        <div class="sc"><div class="sc-val" id="sBest">0</div><div class="sc-lbl">Best streak</div><div class="sc-sub">days 🔥</div></div>
+        <div class="sc"><div class="sc-val" id="sActive">0</div><div class="sc-lbl">Days active</div><div class="sc-sub">since you started</div></div>
+      </div>
+      <div class="sec-label">Your habits</div>
+      <div class="habits-l" id="habitsList"></div>
+      <div class="add-area">
+        <div class="sec-label" style="margin-bottom:10px">Add a new habit</div>
+        <div class="add-row">
+          <div class="icon-sel" id="iconSel" onclick="togglePop(event)"><span id="selIcon">🌿</span><div class="icon-pop" id="iconPop"></div></div>
+          <input class="h-inp" id="hInput" placeholder="e.g. Morning iron supplement…" onkeydown="if(event.key==='Enter')addHabit()"/>
+          <button class="add-btn" onclick="addHabit()">Add</button>
+        </div>
+      </div>
+    </div>
+    <div id="tab-exercise" class="hidden">
+      <div class="pg-head"><div class="pg-title">Exercise</div><div class="pg-sub">Choose your activity — get a lab-matched protocol</div></div>
+      <div class="exercise-section"><div class="sec-label">Your primary exercise</div><div class="ex-grid" id="exGrid"></div><div class="ex-protocol" id="exProtocol"></div></div>
+      <div class="sec-label">Add an exercise habit</div>
+      <div class="habits-l" id="exHabitsList"></div>
+      <div style="background:white;border:1px solid var(--rule);border-radius:13px;padding:16px 18px;box-shadow:var(--sh)">
+        <div class="sec-label" style="margin-bottom:10px">Quick-add exercise habit</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="quickExHabits"></div>
+      </div>
+    </div>
+    <div id="tab-progress" class="hidden">
+      <div class="pg-head"><div class="pg-title">Progress</div><div class="pg-sub">Last 7 days</div></div>
+      <div class="chart-card"><div class="chart-hd"><div class="chart-title">Daily completion rate</div><div class="chart-period">Past 7 days</div></div><canvas id="progChart" height="200"></canvas></div>
+      <div class="chart-card"><div class="chart-hd"><div class="chart-title">Current streaks by habit</div><div class="chart-period">Days in a row</div></div><canvas id="strChart" height="200"></canvas></div>
+    </div>
+    <div id="tab-meals" class="hidden">
+      <div class="pg-head"><div class="pg-title">Meal Log</div><div class="pg-sub">AI-powered — snap a photo, get full nutrition</div></div>
+      <div class="meal-up" id="appUpload"><input type="file" accept="image/*" onchange="runAppMeal(this)"/><div style="font-size:30px;margin-bottom:10px">📸</div><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px">Upload a meal photo</div><div style="font-size:12px;color:var(--ink4)">AI identifies food, counts calories, checks your LDL impact</div></div>
+      <div class="ana-bar-app" id="appAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">Analyzing with AI…</span></div>
+      <div class="sec-label">Today's meals</div>
+      <div class="meal-entries-l" id="mealList"></div>
+    </div>
+    <div id="tab-profile" class="hidden">
+      <div class="pg-head"><div class="pg-title">Profile</div><div class="pg-sub">Account & subscription</div></div>
+      <div class="prof-card"><div class="prof-av" id="profAv">?</div><div style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:3px" id="profName">—</div><div style="font-size:13px;color:var(--ink4);margin-bottom:12px" id="profEmail">—</div><div class="sub-badge sub-free" id="subBadge">⚡ Free Trial</div></div>
+      <div class="prof-card">
+        <div class="sec-label" style="margin-bottom:14px">Subscription</div>
+        <div id="subSection"><p style="font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Unlock unlimited meal AI, full history, exercise protocols, and lab-linked insights.</p><button class="stripe-cta" style="border-radius:11px;font-size:14px;padding:14px" onclick="showStripeModal()">🔒 Subscribe — $9.99/month</button><p class="stripe-note" style="text-align:center">Secure via Stripe · Cancel anytime</p></div>
+      </div>
+      <div class="prof-card"><button class="sign-out" onclick="doSignOut()">Sign out</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="stripeModal">
+  <div class="modal">
+    <div class="modal-title">Subscribe to Nouriva</div>
+    <div class="modal-body">$9.99/month · secure checkout via Stripe.<br/><br/><div style="background:var(--sage4);border-radius:10px;padding:14px;font-size:13px;color:var(--ink2);line-height:1.8">✦ Unlimited habits & streaks<br/>✦ Unlimited AI meal analysis<br/>✦ Exercise protocol generator<br/>✦ Progress charts & history<br/>✦ Lab-linked insights</div></div>
+    <div class="modal-acts"><button class="modal-ok" onclick="confirmSub()">Activate Pro — $9.99/mo</button><button class="modal-no" onclick="closeStripeModal()">Cancel</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SK='nouriva_v1';
+function gs(){try{return JSON.parse(localStorage.getItem(SK))||ds()}catch{return ds()}}
+function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
+function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null}}
+let S=gs();let pChrt=null,sChrt=null;
+const ICONS=['🌿','🏃','💊','🐟','🥗','🧘','💪','🍵','📚','🌙','☀️','🥦','🧴','💧','🧠','❤️','🏋️','🎯','✨','🫁','🩸','🧬','🏊','🚴','⛳','🎾','🥊','🏄','🧗'];
+const EXERCISES=[
+  {id:'tennis',icon:'🎾',label:'Tennis',proto:'Before: banana or hard-boiled egg + rice. Hydrate with electrolytes. Creatine 3-5g before. After: salmon + barley rice for protein, omega-3, and sodium replacement.'},
+  {id:'running',icon:'🏃',label:'Running',proto:'Before: easily digestible carb 45-60 min prior. Hydrate with electrolytes. After: 25-30g protein within 30 min + complex carbs. Omega-3 rich meal accelerates muscle repair.'},
+  {id:'cycling',icon:'🚴',label:'Cycling',proto:'Before: oatmeal or barley-rice 90 min prior. Mid-ride: electrolyte water. After: protein + iron-rich foods. Creatine supports sustained power output.'},
+  {id:'swimming',icon:'🏊',label:'Swimming',proto:'Before: light meal — rice, egg, green tea. After: high-protein recovery — tofu, fish, edamame. Miso soup post-swim replaces sodium ideally.'},
+  {id:'yoga',icon:'🧘',label:'Yoga',proto:'Morning: practice fasted or with light green tea. Evening: magnesium glycinate 30 min before deepens muscle relaxation. Omega-3 reduces joint inflammation.'},
+  {id:'weights',icon:'🏋️',label:'Strength',proto:'Before: 20-30g protein + complex carbs 1-2 hr prior. Creatine 3-5g daily. After: protein within 30 min. Low ferritin will limit your lifts significantly.'},
+  {id:'walking',icon:'🚶',label:'Walking',proto:'Daily 30-45 min walks improve insulin sensitivity and LDL particle size. Walk after meals — 15 min post-dinner reduces blood sugar spikes significantly.'},
+  {id:'golf',icon:'⛳',label:'Golf',proto:'Golf is 4-6 miles of walking — hydrate with electrolytes. Pre-round: complex carbs + protein. Mid-round: nuts + banana. Magnesium nightly reduces muscle tension.'},
+  {id:'hiit',icon:'🥊',label:'HIIT',proto:'Before: light carbs 30-45 min prior. If ferritin is under 20, reduce intensity first. After: 30g protein + electrolyte replacement immediately.'},
+  {id:'pilates',icon:'🤸',label:'Pilates',proto:'Light meal 1 hr before. Low ferritin = chronic fatigue during pilates — iron supplementation improves stamina within 60-90 days. Magnesium before evening sessions.'},
+  {id:'surf',icon:'🏄',label:'Surfing',proto:'Sodium replacement critical — miso soup or coconut water after. Before: complex carbs + protein. After: fatty fish for omega-3.'},
+  {id:'climbing',icon:'🧗',label:'Climbing',proto:'Grip strength requires iron — low ferritin directly limits power. Creatine improves short-burst strength. Magnesium for finger tendon health.'},
+];
+const EX_QUICK_HABITS={tennis:['🎾 Play tennis or hit a wall','🏃 30 min cardio warm-up','💪 Core + shoulder stability'],running:['🏃 Run 30+ min','💪 Strength cross-train 2x/wk','🧘 Post-run stretch 10 min'],cycling:['🚴 Cycle 45+ min','💪 Leg strength training','🏃 Active recovery walk'],swimming:['🏊 Swim 30+ min','💪 Dryland strength training','🧘 Mobility & flexibility'],yoga:['🧘 Yoga 30+ min','🏃 Light cardio 20 min','💪 Bodyweight strength 2x/wk'],weights:['🏋️ Lift weights 45+ min','🏃 Cardio 20 min 3x/wk','🧘 Stretch & recover'],walking:['🚶 Walk 30+ min','💪 Light resistance training','🧘 Evening wind-down walk'],golf:['⛳ Golf round or range','🏃 Walk instead of cart','💪 Rotational strength training'],hiit:['🥊 HIIT session 30 min','🏃 Active recovery walk','💪 Strength 2x/wk'],pilates:['🤸 Pilates 45 min','🏃 Cardio 20 min','🧘 Breathwork 10 min'],surf:['🏄 Surf session','💪 Paddle strength training','🧘 Balance & flexibility'],climbing:['🧗 Climb session','💪 Antagonist training','🤸 Finger tendon warm-up'],};
+function showLanding(){document.getElementById('landing').style.display='';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.remove('on')}
+function showAuth(t){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.remove('hidden');document.getElementById('mainApp').classList.remove('on');switchTab(t||'login')}
+function showApp(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('on');initApp()}
+function switchTab(t){document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('aErr').classList.add('hidden');}
+function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
+function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const users=JSON.parse(localStorage.getItem('nouriva_users')||'{}');const u=users[email.toLowerCase()];if(!u)return showErr('No account found. Create one below.');if(u.pw!==btoa(pass))return showErr('Incorrect password.');const saved=JSON.parse(localStorage.getItem('nouriva_state_'+email)||'null')||ds();saved.user={name:u.name,email};S=saved;persist();showApp();toast('Welcome back, '+u.name.split(' ')[0]+'! 👋')}
+function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const users=JSON.parse(localStorage.getItem('nouriva_users')||'{}');if(users[email.toLowerCase()])return showErr('Account already exists — sign in instead.');users[email.toLowerCase()]={name,pw:btoa(pass)};localStorage.setItem('nouriva_users',JSON.stringify(users));S=ds();S.user={name,email};S.joinedDate=td();S.habits=starterHabits();persist();showApp();toast('Welcome to Nouriva, '+name.split(' ')[0]+'! ✦')}
+function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@nouriva.app'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
+function doSignOut(){persist();S=ds();showLanding();toast('Signed out.')}
+function persist(){if(S.user?.email&&S.user.email!=='guest@nouriva.app'){localStorage.setItem('nouriva_state_'+S.user.email,JSON.stringify(S));}else{ss(S);}}
+function starterHabits(){return[{id:uid(),name:'Morning iron supplement + vitamin C',icon:'💊',created:td()},{id:uid(),name:'Eat fatty fish or take omega-3',icon:'🐟',created:td()},{id:uid(),name:'Barley-rice blend at dinner',icon:'🌿',created:td()},{id:uid(),name:'Magnesium glycinate before bed',icon:'🌙',created:td()},];}
+function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('habits',document.querySelector('.ni'));}
+function updateSubUI(){const p=S.subscribed;document.getElementById('upgradePanel').style.display=p?'none':'';document.getElementById('subBadge').textContent=p?'✦ Pro Subscriber':'⚡ Free Trial';document.getElementById('subBadge').className='sub-badge '+(p?'sub-pro':'sub-free');}
+function goTab(name,btn){['habits','exercise','progress','meals','profile'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==name));document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));if(btn)btn.classList.add('on');if(name==='progress')renderCharts();if(name==='meals')renderMealList();if(name==='exercise')renderExHabits();}
+function renderHabits(){const list=document.getElementById('habitsList');const done=S.completions[td()]||[];if(!S.habits.length){list.innerHTML='<div style="text-align:center;padding:28px;color:var(--ink4);font-size:14px">No habits yet — add your first one below 🌿</div>';updateStats();return;}list.innerHTML='';S.habits.forEach(h=>{const c=done.includes(h.id);const st=streak(h.id);const row=document.createElement('div');row.className='h-row'+(c?' done':'');row.onclick=e=>{if(!e.target.closest('.h-acts'))toggleH(h.id);};row.innerHTML=`<div class="h-chk">${c?'✓':''}</div><span class="h-icon">${h.icon}</span><div class="h-info"><div class="h-name">${h.name}</div><div class="h-meta">Added ${dateLabel(h.created)}</div></div>${st>0?`<div class="h-streak">🔥 ${st}d</div>`:''}<div class="h-acts"><button class="h-del" onclick="delH('${h.id}')">✕</button></div>`;list.appendChild(row);});updateStats();}
+function toggleH(id){const k=td();if(!S.completions[k])S.completions[k]=[];const i=S.completions[k].indexOf(id);if(i>=0)S.completions[k].splice(i,1);else{S.completions[k].push(id);toast('Habit logged ✦');}persist();renderHabits();}
+function addHabit(){const n=document.getElementById('hInput').value.trim();if(!n)return;const icon=document.getElementById('selIcon').textContent;S.habits.push({id:uid(),name:n,icon,created:td()});persist();document.getElementById('hInput').value='';renderHabits();toast('Habit added 🌿');}
+function delH(id){S.habits=S.habits.filter(h=>h.id!==id);Object.keys(S.completions).forEach(k=>{S.completions[k]=S.completions[k].filter(x=>x!==id);});persist();renderHabits();toast('Habit removed.');}
+function streak(id){let s=0,d=new Date();while(s<400){const k=d.toISOString().split('T')[0];if((S.completions[k]||[]).includes(id)){s++;d.setDate(d.getDate()-1);}else break;}return s;}
+function bestStreak(id){let best=0,cur=0;Object.keys(S.completions).sort().forEach(k=>{if((S.completions[k]||[]).includes(id)){cur++;}else{best=Math.max(best,cur);cur=0;}});return Math.max(best,cur);}
+function updateStats(){const done=(S.completions[td()]||[]).length,tot=S.habits.length,pct=tot?Math.round(done/tot*100):0;document.getElementById('sCom').textContent=done+'/'+tot;document.getElementById('sPct').textContent=pct+'% done';document.getElementById('todayBadge').textContent=done;const best=S.habits.reduce((m,h)=>Math.max(m,bestStreak(h.id)),0);document.getElementById('sBest').textContent=best;document.getElementById('sActive').textContent=Object.keys(S.completions).filter(k=>S.completions[k].length>0).length;}
+function buildIconPicker(){document.getElementById('iconPop').innerHTML=ICONS.map(i=>`<div class="i-opt" onclick="pickIcon('${i}')">${i}</div>`).join('');}
+function togglePop(e){e.stopPropagation();document.getElementById('iconPop').classList.toggle('on');}
+function pickIcon(i){document.getElementById('selIcon').textContent=i;document.getElementById('iconPop').classList.remove('on');}
+function buildExGrid(){const g=document.getElementById('exGrid');g.innerHTML=EXERCISES.map(ex=>`<div class="ex-chip${S.exercise===ex.id?' sel':''}" onclick="selectEx('${ex.id}')"><div class="ex-chip-icon">${ex.icon}</div><div class="ex-chip-label">${ex.label}</div></div>`).join('');showExProtocol();}
+function selectEx(id){S.exercise=S.exercise===id?null:id;persist();buildExGrid();renderExHabits();if(id)toast('Exercise set to '+EXERCISES.find(e=>e.id===id).label+' 🏃');}
+function showExProtocol(){const el=document.getElementById('exProtocol');const ex=EXERCISES.find(e=>e.id===S.exercise);if(ex){el.innerHTML='<strong>'+ex.icon+' '+ex.label+' Protocol:</strong><br/>'+ex.proto;el.classList.add('on');}else{el.classList.remove('on');}}
+function renderExHabits(){const ex=EXERCISES.find(e=>e.id===S.exercise);const list=document.getElementById('exHabitsList');const qw=document.getElementById('quickExHabits');const exHabits=S.habits.filter(h=>EX_QUICK_HABITS[S.exercise||'']?.some(q=>q===h.name));if(!ex){list.innerHTML='<div style="padding:16px;font-size:13px;color:var(--ink4)">Choose an activity above to see suggested exercise habits.</div>';qw.innerHTML='';return;}const done=S.completions[td()]||[];list.innerHTML=exHabits.length?exHabits.map(h=>{const c=done.includes(h.id),st=streak(h.id);return`<div class="h-row${c?' done':''}" onclick="toggleH('${h.id}')"><div class="h-chk">${c?'✓':''}</div><span class="h-icon">${h.icon}</span><div class="h-info"><div class="h-name">${h.name}</div></div>${st>0?`<div class="h-streak">🔥 ${st}d</div>`:''}</div>`;}).join(''):'<div style="padding:16px;font-size:13px;color:var(--ink4)">Add suggested habits below →</div>';const suggestions=EX_QUICK_HABITS[S.exercise]||[];qw.innerHTML=suggestions.map(s=>{const exists=S.habits.some(h=>h.name===s);return`<button onclick="quickAdd('${s.replace(/'/g,"\\'")}','${s[0]}')" style="padding:8px 14px;border-radius:9px;border:1.5px solid ${exists?'var(--sage)':'var(--rule)'};background:${exists?'var(--sage4)':'white'};color:${exists?'var(--sage)':'var(--ink2)'};font-size:12px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif">${s}${exists?' ✓':' +'}</button>`;}).join('');}
+function quickAdd(name,icon){if(S.habits.some(h=>h.name===name)){toast('Already in your habits!');return;}S.habits.push({id:uid(),name,icon,created:td()});persist();renderHabits();renderExHabits();toast('Habit added ✦');}
+function renderCharts(){const days=[],rates=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.toISOString().split('T')[0];days.push(d.toLocaleDateString('en-US',{weekday:'short'}));const done=(S.completions[k]||[]).length,tot=S.habits.length||1;rates.push(Math.round(done/tot*100));}if(pChrt)pChrt.destroy();pChrt=new Chart(document.getElementById('progChart'),{type:'bar',data:{labels:days,datasets:[{data:rates,backgroundColor:'#3d6b4f',borderRadius:8,label:'%'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#f2efe9'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});if(sChrt)sChrt.destroy();const sl=S.habits.map(h=>h.icon+' '+h.name.slice(0,14)),sv=S.habits.map(h=>streak(h.id));sChrt=new Chart(document.getElementById('strChart'),{type:'bar',data:{labels:sl,datasets:[{data:sv,backgroundColor:'#b8742a',borderRadius:8,label:'Streak'}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11}},grid:{color:'#f2efe9'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});}
+async function analyzeMeal(file){const b64=await toB64(file);const mt=file.type||'image/jpeg';const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mt,data:b64}},{type:'text',text:`You are a functional medicine nutritionist. Analyze this meal photo carefully. Respond ONLY with valid JSON:\n{"meal_name":"descriptive name","calories":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fiber_g":number,"sugar_g":number,"sodium_mg":number,"iron_mg":number,"omega3_mg":number,"calcium_mg":number,"ldl_impact":"positive or neutral or negative","ldl_note":"one sentence about LDL effect","insights":["insight 1","insight 2","insight 3"]}`}]}]})});const data=await resp.json();const raw=(data.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim();return JSON.parse(raw);}
+async function runLandingAnalysis(input){const file=input.files[0];if(!file)return;const ana=document.getElementById('landingAna');const out=document.getElementById('landingOut');const img=document.getElementById('landingImg');const macros=document.getElementById('landingMacros');const insights=document.getElementById('landingInsights');out.classList.remove('on');img.src=await dataUrl(file);out.classList.add('on');ana.classList.add('on');macros.innerHTML='';insights.innerHTML='';try{const r=await analyzeMeal(file);ana.classList.remove('on');macros.innerHTML=[{val:r.calories,unit:'Calories'},{val:r.protein_g+'g',unit:'Protein'},{val:r.carbs_g+'g',unit:'Carbs'},{val:r.fat_g+'g',unit:'Fat'},{val:r.fiber_g+'g',unit:'Fiber'},{val:r.iron_mg+'mg',unit:'Iron'},].map(m=>`<div class="m-box"><div class="m-val">${m.val}</div><div class="m-unit">${m.unit}</div></div>`).join('');const lc=r.ldl_impact==='positive'?'ldl-pos':r.ldl_impact==='negative'?'ldl-neg':'ldl-neu';insights.innerHTML=`<div class="m-i-title">✦ Health Insights</div><div class="ldl-tag ${lc}">LDL Impact: ${r.ldl_impact} — ${r.ldl_note}</div>${(r.insights||[]).map(i=>`<div class="m-i-item"><span>✦</span><span>${i}</span></div>`).join('')}`;}catch(e){ana.classList.remove('on');macros.innerHTML='<div style="color:var(--rose);font-size:13px;grid-column:1/-1">Analysis failed — please try a different photo.</div>';}input.value='';}
+async function runAppMeal(input){const file=input.files[0];if(!file)return;const ana=document.getElementById('appAna');ana.classList.add('on');try{const r=await analyzeMeal(file);S.meals.unshift({id:uid(),name:r.meal_name||'Meal',time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),calories:r.calories,protein:r.protein_g,carbs:r.carbs_g,fat:r.fat_g,fiber:r.fiber_g,iron:r.iron_mg,omega3:r.omega3_mg,ldl_impact:r.ldl_impact,ldl_note:r.ldl_note,insights:r.insights,date:td()});persist();toast('Meal logged ✦');}catch(e){toast('Analysis failed — try again.');}ana.classList.remove('on');renderMealList();input.value='';}
+function renderMealList(){const el=document.getElementById('mealList');const tm=S.meals.filter(m=>m.date===td());if(!tm.length){el.innerHTML='<div style="text-align:center;padding:28px;font-size:13px;color:var(--ink4)">No meals logged today — upload a photo above 📸</div>';return;}el.innerHTML=tm.map(m=>`<div class="me-card"><div class="me-head"><div><div class="me-name">${m.name}</div><div class="me-time">${m.time}</div></div><div class="me-cals">${m.calories} kcal</div></div><div class="me-pills"><span class="pill">🥩 ${m.protein}g protein</span><span class="pill">🌾 ${m.carbs}g carbs</span><span class="pill">🫒 ${m.fat}g fat</span><span class="pill">🌿 ${m.fiber}g fiber</span><span class="pill">🩸 ${m.iron}mg iron</span><span class="pill ${m.ldl_impact==='positive'?'pill-ldl-pos':m.ldl_impact==='negative'?'pill-ldl-neg':''}">LDL ${m.ldl_impact}</span></div>${m.insights?.length?`<div class="me-note">✦ ${m.insights[0]}</div>`:''}</div>`).join('');}
+function showStripeModal(){document.getElementById('stripeModal').classList.add('on');}
+function closeStripeModal(){document.getElementById('stripeModal').classList.remove('on');}
+function confirmSub(){S.subscribed=true;persist();closeStripeModal();updateSubUI();toast('🎉 Welcome to Nouriva Pro!');}
+function td(){return new Date().toISOString().split('T')[0];}
+function dateLabel(d){return new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});}
+function uid(){return Math.random().toString(36).slice(2);}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+function toB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});}
+function dataUrl(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});}
+window.onclick=function(e){if(!e.target.closest('#iconSel'))document.getElementById('iconPop')?.classList.remove('on');if(e.target===document.getElementById('stripeModal'))closeStripeModal();};
+if(S.user)showApp();else showLanding();
+</script>
+</body>
+</html>
