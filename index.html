@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --ink:#0f0f0f;--ink2:#2e2e2e;--ink3:#5a5a5a;--ink4:#9a9a9a;
@@ -271,6 +272,22 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 .toast.on{opacity:1;transform:translateY(0)}
 .ana-bar-app{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(–sage4);border-radius:10px;margin-bottom:14px}
 .ana-bar-app.on{display:flex}
+
+/* Onboarding */
+.ob-chip{display:inline-flex;align-items:center;padding:7px 13px;border-radius:20px;border:1.5px solid var(--rule);background:var(--rule2);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:'Geist',sans-serif;color:var(--ink2);margin:3px}
+.ob-chip.sel{border-color:var(--sage);background:var(--sage4);color:var(--sage)}
+.ob-toggle-row{display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--rule2);border-radius:12px;margin-bottom:10px}
+.ob-toggle{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-top:2px}
+.ob-toggle input{opacity:0;width:0;height:0}
+.ob-slider{position:absolute;inset:0;background:#ccc;border-radius:24px;cursor:pointer;transition:.2s}
+.ob-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+input:checked+.ob-slider{background:var(--sage)}
+input:checked+.ob-slider:before{transform:translateX(20px)}
+.ob-step{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink4);margin-bottom:10px}
+.ob-scroll{max-height:70vh;overflow-y:auto}
+/* Export */
+.export-btn{padding:8px 14px;border-radius:10px;border:1.5px solid var(--rule);background:white;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:'Geist',sans-serif;white-space:nowrap;transition:.15s}
+.export-btn:hover{border-color:var(--sage);color:var(--sage)}
 </style>
 
 </head>
@@ -390,6 +407,47 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
   </div>
 </div>
 
+<div id="onboardScreen" class="auth-screen hidden">
+  <div class="auth-box ob-scroll" style="max-width:500px">
+    <div id="obStep1">
+      <div class="auth-logo">Miva<span>ra</span></div>
+      <div class="ob-step">Step 1 of 2 — Food Background</div>
+      <p class="auth-sub">What food cultures do you identify with? We'll personalize your meal insights. Select all that apply.</p>
+      <div id="foodChips" style="margin-bottom:12px"></div>
+      <div id="otherWrap" style="display:none;margin-top:6px"><input class="h-inp" id="otherFood" placeholder="Describe your food background…"/></div>
+      <button class="a-submit" style="margin-top:20px" onclick="obNext1()">Continue →</button>
+      <button style="width:100%;padding:10px;margin-top:8px;border:none;background:none;color:var(--ink4);font-size:13px;cursor:pointer;font-family:'Geist',sans-serif" onclick="obNext1()">Skip this step</button>
+    </div>
+    <div id="obStep2" class="hidden">
+      <div class="auth-logo">Miva<span>ra</span></div>
+      <div class="ob-step">Step 2 of 2 — Health Preferences</div>
+      <p class="auth-sub" style="margin-bottom:20px">You can update these anytime in your profile.</p>
+      <div class="ob-toggle-row">
+        <label class="ob-toggle"><input type="checkbox" id="cycleSyncToggle" onchange="toggleCycleFields()"/><span class="ob-slider"></span></label>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px">Cycle-Aware Nutrition Suggestions</div>
+          <div style="font-size:12px;color:var(--ink3);line-height:1.5">Turn on personalized food suggestions based on your menstrual cycle phase.</div>
+        </div>
+      </div>
+      <div id="cycleFields" class="hidden" style="background:var(--rule2);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div class="fld"><label>Cycle start date (most recent)</label><input type="date" id="cycleStartInp"/></div>
+        <div class="fld"><label>Life stage</label>
+          <select id="cycleLifeStageInp" style="width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none">
+            <option value="">Select your life stage…</option>
+            <option>Regular cycle</option>
+            <option>Perimenopause (ages 40–55)</option>
+            <option>Menopause</option>
+            <option>Post-Menopause</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+      <button class="a-submit" onclick="obFinish()">Enter Mivara →</button>
+      <button style="width:100%;padding:10px;margin-top:8px;border:none;background:none;color:var(--ink4);font-size:13px;cursor:pointer;font-family:'Geist',sans-serif" onclick="obFinish()">Skip this step</button>
+    </div>
+  </div>
+</div>
+
 <div id="mainApp" class="app">
   <div class="sidebar">
     <div class="s-logo"><div class="s-logo-mark">Miva<span>ra</span></div><div class="s-logo-sub">Health OS</div></div>
@@ -438,7 +496,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
       <div class="chart-card"><div class="chart-hd"><div class="chart-title">Current streaks by habit</div><div class="chart-period">Days in a row</div></div><canvas id="strChart" height="200"></canvas></div>
     </div>
     <div id="tab-meals" class="hidden">
-      <div class="pg-head"><div class="pg-title">Meal Log</div><div class="pg-sub">AI-powered — snap a photo, get full nutrition</div></div>
+      <div class="pg-head" style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="pg-title">Meal Log</div><div class="pg-sub">AI-powered — snap a photo, get full nutrition</div></div><button class="export-btn" onclick="showExportModal()" style="margin-top:6px">📄 Export Diary</button></div>
       <div class="meal-up" id="appUpload"><input type="file" accept="image/*" onchange="runAppMeal(this)"/><div style="font-size:30px;margin-bottom:10px">📸</div><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px">Upload a meal photo</div><div style="font-size:12px;color:var(--ink4)">AI identifies food, counts calories, checks your LDL impact</div></div>
       <div class="ana-bar-app" id="appAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">Analyzing with AI…</span></div>
       <div class="sec-label">Today's meals</div>
@@ -463,13 +521,34 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
     <div class="modal-acts"><button class="modal-ok" onclick="confirmSub()">Activate Pro — $9.99/mo</button><button class="modal-no" onclick="closeStripeModal()">Cancel</button></div>
   </div>
 </div>
+<div class="modal-bg" id="exportModal">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-title">My Wellness Journal Export</div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:16px;line-height:1.6">Choose a date range and we'll generate a clean PDF you can share with your provider.</p>
+      <div class="fld"><label>Date range</label>
+        <select id="exportRange" onchange="toggleCustomRange()" style="width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none">
+          <option value="7">Last 7 days</option>
+          <option value="14">Last 14 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="custom">Custom range…</option>
+        </select>
+      </div>
+      <div id="customRangeFields" class="hidden">
+        <div class="fld"><label>From</label><input type="date" id="exportFrom" style="width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none"/></div>
+        <div class="fld"><label>To</label><input type="date" id="exportTo" style="width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none"/></div>
+      </div>
+    </div>
+    <div class="modal-acts"><button class="modal-ok" onclick="doExportPDF()">Generate PDF ↓</button><button class="modal-no" onclick="closeExportModal()">Cancel</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
 const SK='mivara_v1';
 function gs(){try{return JSON.parse(localStorage.getItem(SK))||ds()}catch{return ds()}}
 function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
-function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null}}
+function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null,foodBackground:[],otherFoodBackground:'',cycleSync:false,cycleStartDate:'',cycleLifeStage:''}}
 let S=gs();let pChrt=null,sChrt=null;
 const ICONS=['🌿','🏃','💊','🐟','🥗','🧘','💪','🍵','📚','🌙','☀️','🥦','🧴','💧','🧠','❤️','🏋️','🎯','✨','🫁','🩸','🧬','🏊','🚴','⛳','🎾','🥊','🏄','🧗'];
 const EXERCISES=[
@@ -493,7 +572,7 @@ function showApp(){document.getElementById('landing').style.display='none';docum
 function switchTab(t){document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('aErr').classList.add('hidden');}
 function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
 function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');const u=users[email.toLowerCase()];if(!u)return showErr('No account found. Create one below.');if(u.pw!==btoa(pass))return showErr('Incorrect password.');const saved=JSON.parse(localStorage.getItem('mivara_state_'+email)||'null')||ds();saved.user={name:u.name,email};S=saved;persist();showApp();toast('Welcome back, '+u.name.split(' ')[0]+'! 👋')}
-function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');if(users[email.toLowerCase()])return showErr('Account already exists — sign in instead.');users[email.toLowerCase()]={name,pw:btoa(pass)};localStorage.setItem('mivara_users',JSON.stringify(users));S=ds();S.user={name,email};S.joinedDate=td();S.habits=starterHabits();persist();showApp();toast('Welcome to Mivara, '+name.split(' ')[0]+'! ✦')}
+function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');if(users[email.toLowerCase()])return showErr('Account already exists — sign in instead.');users[email.toLowerCase()]={name,pw:btoa(pass)};localStorage.setItem('mivara_users',JSON.stringify(users));S=ds();S.user={name,email};S.joinedDate=td();S.habits=starterHabits();persist();showOnboarding();}
 function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@mivara.ai'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
 function doSignOut(){persist();S=ds();showLanding();toast('Signed out.')}
 function persist(){if(S.user?.email&&S.user.email!=='guest@mivara.ai'){localStorage.setItem('mivara_state_'+S.user.email,JSON.stringify(S));}else{ss(S);}}
@@ -527,6 +606,82 @@ function toggleMic(id){const SR=window.SpeechRecognition||window.webkitSpeechRec
 function showStripeModal(){document.getElementById('stripeModal').classList.add('on');}
 function closeStripeModal(){document.getElementById('stripeModal').classList.remove('on');}
 function confirmSub(){S.subscribed=true;persist();closeStripeModal();updateSubUI();toast('🎉 Welcome to Mivara Pro!');}
+const FOOD_CULTURES=['West African','East African','North African','Caribbean','Latin American / Mexican','South Asian (Indian, Pakistani, Sri Lankan, Bangladeshi)','Southeast Asian (Filipino, Vietnamese, Thai, Indonesian)','East Asian (Chinese, Japanese, Korean)','Middle Eastern / Mediterranean','Indigenous / Native American','Southern American / Soul Food','Eastern European','West European / French / Italian','Brazilian','Ethiopian / Eritrean'];
+function showOnboarding(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('onboardScreen').classList.remove('hidden');document.getElementById('obStep1').classList.remove('hidden');document.getElementById('obStep2').classList.add('hidden');buildFoodChips();}
+function buildFoodChips(){const wrap=document.getElementById('foodChips');const sel=S.foodBackground||[];const allSel=FOOD_CULTURES.every(c=>sel.includes(c));let html=FOOD_CULTURES.map(c=>`<div class="ob-chip${sel.includes(c)?' sel':''}" onclick="obToggleChip(this,'${c.replace(/'/g,"\\'")}')">${c}</div>`).join('');html+=`<div class="ob-chip${allSel?' sel':''}" onclick="obSelectAll()">✅ Select All That Apply</div>`;html+=`<div class="ob-chip${sel.includes('__other__')?' sel':''}" onclick="obToggleOther(this)">✎ Other</div>`;wrap.innerHTML=html;}
+function obToggleChip(el,val){el.classList.toggle('sel');if(!S.foodBackground)S.foodBackground=[];const i=S.foodBackground.indexOf(val);if(i>=0)S.foodBackground.splice(i,1);else S.foodBackground.push(val);}
+function obSelectAll(){const allSel=FOOD_CULTURES.every(c=>(S.foodBackground||[]).includes(c));S.foodBackground=allSel?[]:FOOD_CULTURES.slice();buildFoodChips();document.getElementById('otherWrap').style.display='none';}
+function obToggleOther(el){el.classList.toggle('sel');const show=el.classList.contains('sel');document.getElementById('otherWrap').style.display=show?'block':'none';if(!S.foodBackground)S.foodBackground=[];const i=S.foodBackground.indexOf('__other__');if(show&&i<0)S.foodBackground.push('__other__');else if(!show&&i>=0)S.foodBackground.splice(i,1);}
+function obNext1(){S.otherFoodBackground=document.getElementById('otherFood')?.value.trim()||'';persist();document.getElementById('obStep1').classList.add('hidden');document.getElementById('obStep2').classList.remove('hidden');}
+function toggleCycleFields(){const on=document.getElementById('cycleSyncToggle').checked;document.getElementById('cycleFields').classList.toggle('hidden',!on);}
+function obFinish(){S.cycleSync=document.getElementById('cycleSyncToggle').checked;if(S.cycleSync){S.cycleStartDate=document.getElementById('cycleStartInp').value||'';S.cycleLifeStage=document.getElementById('cycleLifeStageInp').value||'';}persist();document.getElementById('onboardScreen').classList.add('hidden');showApp();toast('Welcome to Mivara, '+S.user.name.split(' ')[0]+'! ✦');}
+function showExportModal(){document.getElementById('exportModal').classList.add('on');}
+function closeExportModal(){document.getElementById('exportModal').classList.remove('on');}
+function toggleCustomRange(){document.getElementById('customRangeFields').classList.toggle('hidden',document.getElementById('exportRange').value!=='custom');}
+function doExportPDF(){const range=document.getElementById('exportRange').value;let from,to=td();if(range==='custom'){from=document.getElementById('exportFrom').value;to=document.getElementById('exportTo').value;if(!from||!to){toast('Please select both dates.');return;}}else{const d=new Date();d.setDate(d.getDate()-parseInt(range)+1);from=d.toISOString().split('T')[0];}closeExportModal();generatePDF(from,to);}
+function generatePDF(from,to){
+  if(!window.jspdf){toast('PDF library loading — please try again.');return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF('p','mm','a4');
+  const W=210,H=297,ML=18,MR=18,MT=32,MB=22,CW=174;
+  const sage=[61,107,79],ink=[15,15,15],ink3=[90,90,90],ink4=[154,154,154],rule=[230,227,222],cream=[242,239,233];
+  const firstName=(S.user?.name||'Your').split(' ')[0];
+  const fmt=d=>new Date(d+'T12:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const strip=s=>(s||'').replace(/[^\x00-\x7F]/g,'').trim();
+  let pn=1,y=MT;
+  function hdr(){
+    doc.setFontSize(6.5);doc.setTextColor(...ink4);doc.setFont('helvetica','normal');
+    doc.text('This journal is a personal wellness self-tracker generated by Mivara AI. It is not a medical record, diagnosis, or treatment plan. Please share with your healthcare provider for context only.',W/2,10,{align:'center',maxWidth:CW});
+    doc.setDrawColor(...rule);doc.setLineWidth(0.3);doc.line(ML,14,W-MR,14);
+    doc.setFontSize(7.5);doc.setTextColor(...ink4);
+    doc.text('Mivara AI  ·  mivara.ai  ·  Clarity Starts Here.',W/2,H-8,{align:'center'});
+    doc.text('Page '+pn,W-MR,H-8,{align:'right'});
+    doc.setDrawColor(...rule);doc.line(ML,H-12,W-MR,H-12);
+  }
+  function np(){doc.addPage();pn++;y=MT;hdr();}
+  function chk(n){if(y+n>H-MB)np();}
+  hdr();
+  doc.setFont('helvetica','bold');doc.setFontSize(22);doc.setTextColor(...sage);doc.text('Mivara',ML,y);
+  const mw=doc.getTextWidth('Mivara');doc.setTextColor(...ink);doc.text(' Wellness Journal',ML+mw,y);y+=8;
+  doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(...ink3);
+  doc.text(firstName+"'s Journal  \xB7  "+fmt(from)+' \u2014 '+fmt(to),ML,y);y+=10;
+  doc.setDrawColor(...rule);doc.setLineWidth(0.4);doc.line(ML,y,W-MR,y);y+=10;
+  const days=[];let cur=new Date(from+'T12:00');const end=new Date(to+'T12:00');
+  while(cur<=end){days.push(cur.toISOString().split('T')[0]);cur.setDate(cur.getDate()+1);}
+  days.forEach(day=>{
+    const meals=S.meals.filter(m=>m.date===day);
+    const done=S.completions[day]||[];
+    const dl=new Date(day+'T12:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    chk(16);
+    doc.setFillColor(...sage);doc.roundedRect(ML,y-3,CW,11,1.5,1.5,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);doc.text(dl,ML+4,y+5);y+=15;
+    if(!meals.length){chk(8);doc.setFont('helvetica','italic');doc.setFontSize(9);doc.setTextColor(...ink4);doc.text('No meals logged this day.',ML+3,y);y+=10;}
+    else{
+      meals.forEach(m=>{
+        chk(22);
+        doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...ink);doc.text(strip(m.name)||'Meal',ML+2,y);
+        doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...ink4);doc.text(m.time||'',W-MR,y,{align:'right'});y+=5;
+        doc.setFontSize(8.5);doc.setTextColor(...ink3);
+        doc.text((m.calories||0)+' kcal  \xB7  '+(m.protein||0)+'g protein  \xB7  '+(m.carbs||0)+'g carbs  \xB7  '+(m.fat||0)+'g fat  \xB7  '+(m.fiber||0)+'g fiber',ML+2,y);y+=4;
+        if(m.note){chk(6);doc.setFontSize(8);doc.setTextColor(...ink4);const nl=doc.splitTextToSize('Note: '+strip(m.note),CW-6);doc.text(nl,ML+2,y);y+=nl.length*4+1;}
+        doc.setDrawColor(...rule);doc.setLineWidth(0.25);doc.line(ML,y+1,W-MR,y+1);y+=6;
+      });
+      chk(12);
+      const tc=meals.reduce((s,m)=>s+(+m.calories||0),0),tp=meals.reduce((s,m)=>s+(+m.protein||0),0),tch=meals.reduce((s,m)=>s+(+m.carbs||0),0),tf=meals.reduce((s,m)=>s+(+m.fat||0),0);
+      doc.setFillColor(...cream);doc.roundedRect(ML,y-2,CW,9,1,1,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...ink);
+      doc.text('Daily Total:  '+tc+' kcal  \xB7  '+tp+'g protein  \xB7  '+tch+'g carbs  \xB7  '+tf+'g fat',ML+4,y+4);y+=13;
+    }
+    chk(10);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(...sage);doc.text('HABITS',ML,y);y+=5;
+    if(!S.habits.length){doc.setFont('helvetica','italic');doc.setFontSize(9);doc.setTextColor(...ink4);doc.text('No habits tracked.',ML+3,y);y+=7;}
+    else{S.habits.forEach(h=>{chk(7);const dn=done.includes(h.id);doc.setFillColor(dn?sage[0]:255,dn?sage[1]:255,dn?sage[2]:255);doc.setDrawColor(dn?sage[0]:180,dn?sage[1]:180,dn?sage[2]:180);doc.roundedRect(ML,y-3,4,4,0.5,0.5,'FD');if(dn){doc.setFont('helvetica','bold');doc.setFontSize(5);doc.setTextColor(255,255,255);doc.text('v',ML+1,y+0.5);}doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(dn?sage[0]:ink[0],dn?sage[1]:ink[1],dn?sage[2]:ink[2]);doc.text(strip(h.name)||'Habit',ML+6,y);y+=6;});y+=2;}
+    chk(32);doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...ink3);doc.text('Notes for my provider:',ML,y);y+=5;
+    doc.setDrawColor(...rule);doc.setLineWidth(0.3);for(let i=0;i<3;i++){doc.line(ML,y+i*8,W-MR,y+i*8);}y+=32;
+  });
+  if(S.labValues&&Object.keys(S.labValues).length){np();doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...sage);doc.text('Lab Values Snapshot',ML,y);y+=10;Object.entries(S.labValues).forEach(([k,v])=>{chk(7);doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(...ink);doc.text(k+': '+v,ML,y);y+=7;});}
+  doc.save('Mivara-Wellness-Journal-'+from+'-to-'+to+'.pdf');
+  toast('Journal downloaded \u2726');
+}
 function td(){return new Date().toISOString().split('T')[0];}
 function dateLabel(d){return new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});}
 function uid(){return Math.random().toString(36).slice(2);}
