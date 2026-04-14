@@ -296,7 +296,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
   <div class="preview-wrap">
     <div class="preview-label">What it looks like inside</div>
     <div class="preview-frame">
-      <div class="pf-bar"><div class="pf-dots"><div class="pf-dot" style="background:#ff5f57"></div><div class="pf-dot" style="background:#febc2e"></div><div class="pf-dot" style="background:#28c840"></div></div><div class="pf-url">mivara.app — Today's Habits</div><div style="width:46px"></div></div>
+      <div class="pf-bar"><div class="pf-dots"><div class="pf-dot" style="background:#ff5f57"></div><div class="pf-dot" style="background:#febc2e"></div><div class="pf-dot" style="background:#28c840"></div></div><div class="pf-url">mivara.ai — Today's Habits</div><div style="width:46px"></div></div>
       <div class="pf-body">
         <div class="pf-habits">
           <div class="pf-habit done"><div class="pf-chk">✓</div><span class="pf-hname">Iron supplement + vitamin C</span><span class="pf-str">🔥 14</span></div>
@@ -355,7 +355,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
       <p class="stripe-note">Secure payment via Stripe · Cancel anytime · 14-day free trial</p>
     </div>
   </div>
-  <div style="text-align:center;padding:32px;font-size:12px;color:var(--ink4);border-top:1px solid var(--rule)">© 2026 Mivara Health · <a href="#" style="color:var(--ink4)">Privacy</a> · <a href="#" style="color:var(--ink4)">Terms</a></div>
+  <div style="text-align:center;padding:32px;font-size:12px;color:var(--ink4);border-top:1px solid var(--rule)">© 2026 Mivara AI · <a href="#" style="color:var(--ink4)">Privacy</a> · <a href="#" style="color:var(--ink4)">Terms</a></div>
 </div>
 
 <div id="authScreen" class="auth-screen hidden">
@@ -488,9 +488,9 @@ function switchTab(t){document.getElementById('aTabLogin').classList.toggle('on'
 function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
 function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');const u=users[email.toLowerCase()];if(!u)return showErr('No account found. Create one below.');if(u.pw!==btoa(pass))return showErr('Incorrect password.');const saved=JSON.parse(localStorage.getItem('mivara_state_'+email)||'null')||ds();saved.user={name:u.name,email};S=saved;persist();showApp();toast('Welcome back, '+u.name.split(' ')[0]+'! 👋')}
 function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');if(users[email.toLowerCase()])return showErr('Account already exists — sign in instead.');users[email.toLowerCase()]={name,pw:btoa(pass)};localStorage.setItem('mivara_users',JSON.stringify(users));S=ds();S.user={name,email};S.joinedDate=td();S.habits=starterHabits();persist();showApp();toast('Welcome to Mivara, '+name.split(' ')[0]+'! ✦')}
-function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@mivara.app'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
+function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@mivara.ai'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
 function doSignOut(){persist();S=ds();showLanding();toast('Signed out.')}
-function persist(){if(S.user?.email&&S.user.email!=='guest@mivara.app'){localStorage.setItem('mivara_state_'+S.user.email,JSON.stringify(S));}else{ss(S);}}
+function persist(){if(S.user?.email&&S.user.email!=='guest@mivara.ai'){localStorage.setItem('mivara_state_'+S.user.email,JSON.stringify(S));}else{ss(S);}}
 function starterHabits(){return[{id:uid(),name:'Morning iron supplement + vitamin C',icon:'💊',created:td()},{id:uid(),name:'Eat fatty fish or take omega-3',icon:'🐟',created:td()},{id:uid(),name:'Barley-rice blend at dinner',icon:'🌿',created:td()},{id:uid(),name:'Magnesium glycinate before bed',icon:'🌙',created:td()},];}
 function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('habits',document.querySelector('.ni'));}
 function updateSubUI(){const p=S.subscribed;document.getElementById('upgradePanel').style.display=p?'none':'';document.getElementById('subBadge').textContent=p?'✦ Pro Subscriber':'⚡ Free Trial';document.getElementById('subBadge').className='sub-badge '+(p?'sub-pro':'sub-free');}
