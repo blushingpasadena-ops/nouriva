@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Nouriva — Your Health, Reclaimed</title>
+<title>Mivara — Your Health, Reclaimed</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -289,14 +289,14 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
     <p class="hero-note">14-day free trial · $9.99/mo after · cancel anytime</p>
   </div>
   <div class="for-whom">
-    <div class="for-card"><div class="for-icon">🧪</div><div class="for-title">Your labs came back flagged</div><div class="for-desc">High LDL, low ferritin, pre-diabetes markers — Nouriva translates results into daily habits and foods that actually move the needle.</div></div>
+    <div class="for-card"><div class="for-icon">🧪</div><div class="for-title">Your labs came back flagged</div><div class="for-desc">High LDL, low ferritin, pre-diabetes markers — Mivara translates results into daily habits and foods that actually move the needle.</div></div>
     <div class="for-card"><div class="for-icon">🌿</div><div class="for-title">You want food as medicine</div><div class="for-desc">Snap a photo of any meal — our AI breaks down every macro, flags LDL impact, and ties it to your specific lab concerns.</div></div>
     <div class="for-card"><div class="for-icon">📈</div><div class="for-title">You need accountability</div><div class="for-desc">Streaks, progress charts, and a supplement timing system make it easy to stay consistent — even on your busiest days.</div></div>
   </div>
   <div class="preview-wrap">
     <div class="preview-label">What it looks like inside</div>
     <div class="preview-frame">
-      <div class="pf-bar"><div class="pf-dots"><div class="pf-dot" style="background:#ff5f57"></div><div class="pf-dot" style="background:#febc2e"></div><div class="pf-dot" style="background:#28c840"></div></div><div class="pf-url">nouriva.app — Today's Habits</div><div style="width:46px"></div></div>
+      <div class="pf-bar"><div class="pf-dots"><div class="pf-dot" style="background:#ff5f57"></div><div class="pf-dot" style="background:#febc2e"></div><div class="pf-dot" style="background:#28c840"></div></div><div class="pf-url">mivara.ai — Today's Habits</div><div style="width:46px"></div></div>
       <div class="pf-body">
         <div class="pf-habits">
           <div class="pf-habit done"><div class="pf-chk">✓</div><span class="pf-hname">Iron supplement + vitamin C</span><span class="pf-str">🔥 14</span></div>
@@ -355,7 +355,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
       <p class="stripe-note">Secure payment via Stripe · Cancel anytime · 14-day free trial</p>
     </div>
   </div>
-  <div style="text-align:center;padding:32px;font-size:12px;color:var(--ink4);border-top:1px solid var(--rule)">© 2026 Nouriva Health · <a href="#" style="color:var(--ink4)">Privacy</a> · <a href="#" style="color:var(--ink4)">Terms</a></div>
+  <div style="text-align:center;padding:32px;font-size:12px;color:var(--ink4);border-top:1px solid var(--rule)">© 2026 Mivara AI · <a href="#" style="color:var(--ink4)">Privacy</a> · <a href="#" style="color:var(--ink4)">Terms</a></div>
 </div>
 
 <div id="authScreen" class="auth-screen hidden">
@@ -452,7 +452,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 
 <div class="modal-bg" id="stripeModal">
   <div class="modal">
-    <div class="modal-title">Subscribe to Nouriva</div>
+    <div class="modal-title">Subscribe to Mivara</div>
     <div class="modal-body">$9.99/month · secure checkout via Stripe.<br/><br/><div style="background:var(--sage4);border-radius:10px;padding:14px;font-size:13px;color:var(--ink2);line-height:1.8">✦ Unlimited habits & streaks<br/>✦ Unlimited AI meal analysis<br/>✦ Exercise protocol generator<br/>✦ Progress charts & history<br/>✦ Lab-linked insights</div></div>
     <div class="modal-acts"><button class="modal-ok" onclick="confirmSub()">Activate Pro — $9.99/mo</button><button class="modal-no" onclick="closeStripeModal()">Cancel</button></div>
   </div>
@@ -460,7 +460,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 <div class="toast" id="toast"></div>
 
 <script>
-const SK='nouriva_v1';
+const SK='mivara_v1';
 function gs(){try{return JSON.parse(localStorage.getItem(SK))||ds()}catch{return ds()}}
 function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
 function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null}}
@@ -486,11 +486,11 @@ function showAuth(t){document.getElementById('landing').style.display='none';doc
 function showApp(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('on');initApp()}
 function switchTab(t){document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('aErr').classList.add('hidden');}
 function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
-function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const users=JSON.parse(localStorage.getItem('nouriva_users')||'{}');const u=users[email.toLowerCase()];if(!u)return showErr('No account found. Create one below.');if(u.pw!==btoa(pass))return showErr('Incorrect password.');const saved=JSON.parse(localStorage.getItem('nouriva_state_'+email)||'null')||ds();saved.user={name:u.name,email};S=saved;persist();showApp();toast('Welcome back, '+u.name.split(' ')[0]+'! 👋')}
-function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const users=JSON.parse(localStorage.getItem('nouriva_users')||'{}');if(users[email.toLowerCase()])return showErr('Account already exists — sign in instead.');users[email.toLowerCase()]={name,pw:btoa(pass)};localStorage.setItem('nouriva_users',JSON.stringify(users));S=ds();S.user={name,email};S.joinedDate=td();S.habits=starterHabits();persist();showApp();toast('Welcome to Nouriva, '+name.split(' ')[0]+'! ✦')}
-function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@nouriva.app'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
+function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');const u=users[email.toLowerCase()];if(!u)return showErr('No account found. Create one below.');if(u.pw!==btoa(pass))return showErr('Incorrect password.');const saved=JSON.parse(localStorage.getItem('mivara_state_'+email)||'null')||ds();saved.user={name:u.name,email};S=saved;persist();showApp();toast('Welcome back, '+u.name.split(' ')[0]+'! 👋')}
+function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');if(users[email.toLowerCase()])return showErr('Account already exists — sign in instead.');users[email.toLowerCase()]={name,pw:btoa(pass)};localStorage.setItem('mivara_users',JSON.stringify(users));S=ds();S.user={name,email};S.joinedDate=td();S.habits=starterHabits();persist();showApp();toast('Welcome to Mivara, '+name.split(' ')[0]+'! ✦')}
+function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@mivara.ai'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
 function doSignOut(){persist();S=ds();showLanding();toast('Signed out.')}
-function persist(){if(S.user?.email&&S.user.email!=='guest@nouriva.app'){localStorage.setItem('nouriva_state_'+S.user.email,JSON.stringify(S));}else{ss(S);}}
+function persist(){if(S.user?.email&&S.user.email!=='guest@mivara.ai'){localStorage.setItem('mivara_state_'+S.user.email,JSON.stringify(S));}else{ss(S);}}
 function starterHabits(){return[{id:uid(),name:'Morning iron supplement + vitamin C',icon:'💊',created:td()},{id:uid(),name:'Eat fatty fish or take omega-3',icon:'🐟',created:td()},{id:uid(),name:'Barley-rice blend at dinner',icon:'🌿',created:td()},{id:uid(),name:'Magnesium glycinate before bed',icon:'🌙',created:td()},];}
 function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('habits',document.querySelector('.ni'));}
 function updateSubUI(){const p=S.subscribed;document.getElementById('upgradePanel').style.display=p?'none':'';document.getElementById('subBadge').textContent=p?'✦ Pro Subscriber':'⚡ Free Trial';document.getElementById('subBadge').className='sub-badge '+(p?'sub-pro':'sub-free');}
@@ -517,7 +517,7 @@ async function runAppMeal(input){const file=input.files[0];if(!file)return;const
 function renderMealList(){const el=document.getElementById('mealList');const tm=S.meals.filter(m=>m.date===td());if(!tm.length){el.innerHTML='<div style="text-align:center;padding:28px;font-size:13px;color:var(--ink4)">No meals logged today — upload a photo above 📸</div>';return;}el.innerHTML=tm.map(m=>`<div class="me-card"><div class="me-head"><div><div class="me-name">${m.name}</div><div class="me-time">${m.time}</div></div><div class="me-cals">${m.calories} kcal</div></div><div class="me-pills"><span class="pill">🥩 ${m.protein}g protein</span><span class="pill">🌾 ${m.carbs}g carbs</span><span class="pill">🫒 ${m.fat}g fat</span><span class="pill">🌿 ${m.fiber}g fiber</span><span class="pill">🩸 ${m.iron}mg iron</span><span class="pill ${m.ldl_impact==='positive'?'pill-ldl-pos':m.ldl_impact==='negative'?'pill-ldl-neg':''}">LDL ${m.ldl_impact}</span></div>${m.insights?.length?`<div class="me-note">✦ ${m.insights[0]}</div>`:''}</div>`).join('');}
 function showStripeModal(){document.getElementById('stripeModal').classList.add('on');}
 function closeStripeModal(){document.getElementById('stripeModal').classList.remove('on');}
-function confirmSub(){S.subscribed=true;persist();closeStripeModal();updateSubUI();toast('🎉 Welcome to Nouriva Pro!');}
+function confirmSub(){S.subscribed=true;persist();closeStripeModal();updateSubUI();toast('🎉 Welcome to Mivara Pro!');}
 function td(){return new Date().toISOString().split('T')[0];}
 function dateLabel(d){return new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});}
 function uid(){return Math.random().toString(36).slice(2);}
