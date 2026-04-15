@@ -4,10 +4,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Mivara — Your Health, Reclaimed</title>
+<title>Mivara™ — Your Health, Reclaimed</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --ink:#0f0f0f;--ink2:#2e2e2e;--ink3:#5a5a5a;--ink4:#9a9a9a;
@@ -243,6 +244,13 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 .pill-ldl-pos{background:var(–sage4);color:var(–sage)}
 .pill-ldl-neg{background:var(–rose2);color:var(–rose)}
 .me-note{margin-top:9px;font-size:12px;color:var(–ink3);line-height:1.5;padding:9px 11px;background:var(–rule2);border-radius:8px}
+.me-clarify{margin-top:10px;display:flex;gap:7px;align-items:flex-start}
+.me-clarify-input{flex:1;font-size:12px;padding:8px 10px;border:1px solid var(–rule);border-radius:8px;resize:none;font-family:inherit;color:var(–ink);background:var(–bg);min-height:36px;line-height:1.4;outline:none}
+.me-clarify-input:focus{border-color:var(–sage3)}
+.me-mic{width:36px;height:36px;border-radius:8px;border:1px solid var(–rule);background:white;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+.me-mic.on{background:var(–rose2);border-color:var(–rose);animation:mic-pulse .9s infinite}
+@keyframes mic-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.ai-disclaimer{font-size:10px;color:var(--ink4);font-style:italic;margin-top:6px;padding-top:5px;border-top:1px solid var(--rule)}
 
 .prof-card{background:white;border:1px solid var(–rule);border-radius:var(–r);padding:22px;box-shadow:var(–sh);margin-bottom:14px}
 .prof-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(–sage),var(–sage2));display:flex;align-items:center;justify-content:center;color:white;margin-bottom:14px;font-family:‘Cormorant Garamond’,serif;font-size:26px;font-weight:600}
@@ -265,6 +273,22 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 .toast.on{opacity:1;transform:translateY(0)}
 .ana-bar-app{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(–sage4);border-radius:10px;margin-bottom:14px}
 .ana-bar-app.on{display:flex}
+
+/* Onboarding */
+.ob-chip{display:inline-flex;align-items:center;padding:7px 13px;border-radius:20px;border:1.5px solid var(--rule);background:var(--rule2);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:'Geist',sans-serif;color:var(--ink2);margin:3px}
+.ob-chip.sel{border-color:var(--sage);background:var(--sage4);color:var(--sage)}
+.ob-toggle-row{display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--rule2);border-radius:12px;margin-bottom:10px}
+.ob-toggle{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-top:2px}
+.ob-toggle input{opacity:0;width:0;height:0}
+.ob-slider{position:absolute;inset:0;background:#ccc;border-radius:24px;cursor:pointer;transition:.2s}
+.ob-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+input:checked+.ob-slider{background:var(--sage)}
+input:checked+.ob-slider:before{transform:translateX(20px)}
+.ob-step{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink4);margin-bottom:10px}
+.ob-scroll{max-height:70vh;overflow-y:auto}
+/* Export */
+.export-btn{padding:8px 14px;border-radius:10px;border:1.5px solid var(--rule);background:white;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:'Geist',sans-serif;white-space:nowrap;transition:.15s}
+.export-btn:hover{border-color:var(--sage);color:var(--sage)}
 </style>
 
 </head>
@@ -272,7 +296,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 
 <div id="landing" class="landing">
   <nav class="l-nav">
-    <div class="v-logo">Miva<span>ra</span></div>
+    <div class="v-logo">Miva<span>ra™</span></div>
     <div class="l-nav-btns">
       <button class="btn-o" onclick="showAuth('login')">Sign in</button>
       <button class="btn-f" onclick="showAuth('signup')">Start free →</button>
@@ -335,32 +359,47 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
       </div>
     </div>
   </div>
-  <div class="price-wrap">
-    <div class="price-label">Simple pricing</div>
-    <h2 class="price-h">One plan. Everything included.</h2>
-    <p class="price-p">No tiers, no upsells. Cancel anytime.</p>
-    <div class="price-card">
-      <div class="price-amt">$9<span style="font-size:28px">.99</span></div>
-      <div class="price-per">per month</div>
-      <div class="price-feats">
-        <div class="price-feat"><span class="pf-check">✦</span>Unlimited habits with streak tracking</div>
-        <div class="price-feat"><span class="pf-check">✦</span>AI meal photo analysis — calories, macros, LDL impact</div>
-        <div class="price-feat"><span class="pf-check">✦</span>Lab-linked nutrition insights</div>
-        <div class="price-feat"><span class="pf-check">✦</span>Exercise protocol generator</div>
-        <div class="price-feat"><span class="pf-check">✦</span>Weekly progress charts & streak history</div>
-        <div class="price-feat"><span class="pf-check">✦</span>Supplement timing guide</div>
-        <div class="price-feat"><span class="pf-check">✦</span>Cycle & hormone nutrition guide</div>
+  <div class="price-wrap" style="max-width:720px">
+    <div class="price-label">Pricing</div>
+    <h2 class="price-h">Start free. Upgrade when you're ready.</h2>
+    <p class="price-p">14-day Premium trial on every new account — no credit card required.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="background:white;border:1px solid var(--rule);border-radius:22px;padding:28px;box-shadow:var(--sh)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink4);text-transform:uppercase;margin-bottom:10px">Free</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;color:var(--ink);letter-spacing:-1px;line-height:1">$0</div>
+        <div style="font-size:14px;color:var(--ink3);margin-bottom:20px">always free</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:var(--ink2)">
+          <div>✓ 2 meal photo scans per day</div>
+          <div>✓ Basic habit tracking</div>
+          <div>✓ 2 free webinars</div>
+          <div>✓ Community access</div>
+        </div>
       </div>
-      <button class="stripe-cta" onclick="showStripeModal()">🔒 Subscribe — $9.99/month</button>
-      <p class="stripe-note">Secure payment via Stripe · Cancel anytime · 14-day free trial</p>
+      <div class="price-card" style="border:2px solid var(--sage)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--sage);text-transform:uppercase;margin-bottom:10px">Premium</div>
+        <div class="price-amt">$9<span style="font-size:28px">.99</span></div>
+        <div class="price-per">per month</div>
+        <div class="price-feats">
+          <div class="price-feat"><span class="pf-check">✦</span>Unlimited meal photo scans</div>
+          <div class="price-feat"><span class="pf-check">✦</span>Cycle sync nutrition</div>
+          <div class="price-feat"><span class="pf-check">✦</span>Perimenopause &amp; menopause mode</div>
+          <div class="price-feat"><span class="pf-check">✦</span>Lab trend insights</div>
+          <div class="price-feat"><span class="pf-check">✦</span>Food diary PDF export</div>
+          <div class="price-feat"><span class="pf-check">✦</span>Full webinar library</div>
+          <div class="price-feat"><span class="pf-check">✦</span>Accountability circles</div>
+          <div class="price-feat"><span class="pf-check">✦</span>Bone health &amp; body comp tools</div>
+        </div>
+        <button class="stripe-cta" onclick="showAuth('signup')">Start 14-day free trial →</button>
+        <p class="stripe-note">No credit card required · $9.99/mo after trial · Cancel anytime</p>
+      </div>
     </div>
   </div>
-  <div style="text-align:center;padding:32px;font-size:12px;color:var(--ink4);border-top:1px solid var(--rule)">© 2026 Mivara AI · <a href="#" style="color:var(--ink4)">Privacy</a> · <a href="#" style="color:var(--ink4)">Terms</a></div>
+  <div style="text-align:center;padding:32px;font-size:12px;color:var(--ink4);border-top:1px solid var(--rule)">© 2026 Mivara™ AI. All rights reserved. · <a href="#" style="color:var(--ink4)">Privacy</a> · <a href="#" style="color:var(--ink4)">Terms</a></div>
 </div>
 
 <div id="authScreen" class="auth-screen hidden">
   <div class="auth-box">
-    <div class="auth-logo">Miva<span>ra</span></div>
+    <div class="auth-logo">Miva<span>ra™</span></div>
     <p class="auth-sub">Your personal health OS — built around your lab results.</p>
     <div class="auth-tabs">
       <button class="a-tab on" id="aTabLogin" onclick="switchTab('login')">Sign in</button>
@@ -384,9 +423,50 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
   </div>
 </div>
 
+<div id="onboardScreen" class="auth-screen hidden">
+  <div class="auth-box ob-scroll" style="max-width:500px">
+    <div id="obStep1">
+      <div class="auth-logo">Miva<span>ra™</span></div>
+      <div class="ob-step">Step 1 of 2 — Food Background</div>
+      <p class="auth-sub">What food cultures do you identify with? We'll personalize your meal insights. Select all that apply.</p>
+      <div id="foodChips" style="margin-bottom:12px"></div>
+      <div id="otherWrap" style="display:none;margin-top:6px"><input class="h-inp" id="otherFood" placeholder="Describe your food background…"/></div>
+      <button class="a-submit" style="margin-top:20px" onclick="obNext1()">Continue →</button>
+      <button style="width:100%;padding:10px;margin-top:8px;border:none;background:none;color:var(--ink4);font-size:13px;cursor:pointer;font-family:'Geist',sans-serif" onclick="obNext1()">Skip this step</button>
+    </div>
+    <div id="obStep2" class="hidden">
+      <div class="auth-logo">Miva<span>ra</span></div>
+      <div class="ob-step">Step 2 of 2 — Health Preferences</div>
+      <p class="auth-sub" style="margin-bottom:20px">You can update these anytime in your profile.</p>
+      <div class="ob-toggle-row">
+        <label class="ob-toggle"><input type="checkbox" id="cycleSyncToggle" onchange="toggleCycleFields()"/><span class="ob-slider"></span></label>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px">Cycle-Aware Nutrition Suggestions</div>
+          <div style="font-size:12px;color:var(--ink3);line-height:1.5">Turn on personalized food suggestions based on your menstrual cycle phase.</div>
+        </div>
+      </div>
+      <div id="cycleFields" class="hidden" style="background:var(--rule2);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div class="fld"><label>Cycle start date (most recent)</label><input type="date" id="cycleStartInp"/></div>
+        <div class="fld"><label>Life stage</label>
+          <select id="cycleLifeStageInp" style="width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none">
+            <option value="">Select your life stage…</option>
+            <option>Regular cycle</option>
+            <option>Perimenopause (ages 40–55)</option>
+            <option>Menopause</option>
+            <option>Post-Menopause</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+      <button class="a-submit" onclick="obFinish()">Enter Mivara →</button>
+      <button style="width:100%;padding:10px;margin-top:8px;border:none;background:none;color:var(--ink4);font-size:13px;cursor:pointer;font-family:'Geist',sans-serif" onclick="obFinish()">Skip this step</button>
+    </div>
+  </div>
+</div>
+
 <div id="mainApp" class="app">
   <div class="sidebar">
-    <div class="s-logo"><div class="s-logo-mark">Miva<span>ra</span></div><div class="s-logo-sub">Health OS</div></div>
+    <div class="s-logo"><div class="s-logo-mark">Miva<span>ra™</span></div><div class="s-logo-sub">Health OS</div></div>
     <div class="s-nav">
       <button class="ni on" onclick="goTab('habits',this)"><span class="ni-icon">✦</span><span class="ni-label">Habits</span><span class="ni-badge" id="todayBadge">0</span></button>
       <button class="ni" onclick="goTab('exercise',this)"><span class="ni-icon">🏃</span><span class="ni-label">Exercise</span></button>
@@ -395,7 +475,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
       <button class="ni" onclick="goTab('profile',this)"><span class="ni-icon">⚙️</span><span class="ni-label">Profile</span></button>
     </div>
     <div class="s-user" onclick="goTab('profile',null)"><div class="s-uname" id="sUserName">—</div><div class="s-uemail" id="sUserEmail">—</div></div>
-    <div class="s-up" id="upgradePanel"><div class="s-up-title">Upgrade to Pro</div><div class="s-up-desc">Unlock full meal AI, history & charts.</div><button class="s-up-btn" onclick="showStripeModal()">$9.99/mo →</button></div>
+    <div class="s-up" id="upgradePanel"></div>
   </div>
   <div class="main-content">
     <div id="tab-habits">
@@ -417,7 +497,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
       </div>
     </div>
     <div id="tab-exercise" class="hidden">
-      <div class="pg-head"><div class="pg-title">Exercise</div><div class="pg-sub">Choose your activity — get a lab-matched protocol</div></div>
+      <div class="pg-head"><div class="pg-title">Exercise</div><div class="pg-sub">Choose your activity — get lab-matched wellness suggestions</div></div>
       <div class="exercise-section"><div class="sec-label">Your primary exercise</div><div class="ex-grid" id="exGrid"></div><div class="ex-protocol" id="exProtocol"></div></div>
       <div class="sec-label">Add an exercise habit</div>
       <div class="habits-l" id="exHabitsList"></div>
@@ -432,7 +512,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
       <div class="chart-card"><div class="chart-hd"><div class="chart-title">Current streaks by habit</div><div class="chart-period">Days in a row</div></div><canvas id="strChart" height="200"></canvas></div>
     </div>
     <div id="tab-meals" class="hidden">
-      <div class="pg-head"><div class="pg-title">Meal Log</div><div class="pg-sub">AI-powered — snap a photo, get full nutrition</div></div>
+      <div class="pg-head" style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="pg-title">Meal Log</div><div class="pg-sub">AI-powered — snap a photo, get full nutrition</div></div><button class="export-btn" onclick="showExportModal()" style="margin-top:6px">📄 Export Diary</button></div>
       <div class="meal-up" id="appUpload"><input type="file" accept="image/*" onchange="runAppMeal(this)"/><div style="font-size:30px;margin-bottom:10px">📸</div><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px">Upload a meal photo</div><div style="font-size:12px;color:var(--ink4)">AI identifies food, counts calories, checks your LDL impact</div></div>
       <div class="ana-bar-app" id="appAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">Analyzing with AI…</span></div>
       <div class="sec-label">Today's meals</div>
@@ -443,7 +523,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
       <div class="prof-card"><div class="prof-av" id="profAv">?</div><div style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:3px" id="profName">—</div><div style="font-size:13px;color:var(--ink4);margin-bottom:12px" id="profEmail">—</div><div class="sub-badge sub-free" id="subBadge">⚡ Free Trial</div></div>
       <div class="prof-card">
         <div class="sec-label" style="margin-bottom:14px">Subscription</div>
-        <div id="subSection"><p style="font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Unlock unlimited meal AI, full history, exercise protocols, and lab-linked insights.</p><button class="stripe-cta" style="border-radius:11px;font-size:14px;padding:14px" onclick="showStripeModal()">🔒 Subscribe — $9.99/month</button><p class="stripe-note" style="text-align:center">Secure via Stripe · Cancel anytime</p></div>
+        <div id="subSection"><p style="font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Unlock unlimited meal AI, full history, exercise suggestions, and lab-linked insights.</p><button class="stripe-cta" style="border-radius:11px;font-size:14px;padding:14px" onclick="showStripeModal()">🔒 Subscribe — $9.99/month</button><p class="stripe-note" style="text-align:center">Secure via Stripe · Cancel anytime</p></div>
       </div>
       <div class="prof-card"><button class="sign-out" onclick="doSignOut()">Sign out</button></div>
     </div>
@@ -452,9 +532,38 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 
 <div class="modal-bg" id="stripeModal">
   <div class="modal">
-    <div class="modal-title">Subscribe to Mivara</div>
-    <div class="modal-body">$9.99/month · secure checkout via Stripe.<br/><br/><div style="background:var(--sage4);border-radius:10px;padding:14px;font-size:13px;color:var(--ink2);line-height:1.8">✦ Unlimited habits & streaks<br/>✦ Unlimited AI meal analysis<br/>✦ Exercise protocol generator<br/>✦ Progress charts & history<br/>✦ Lab-linked insights</div></div>
-    <div class="modal-acts"><button class="modal-ok" onclick="confirmSub()">Activate Pro — $9.99/mo</button><button class="modal-no" onclick="closeStripeModal()">Cancel</button></div>
+    <div class="modal-title">Start Your Free Trial</div>
+    <div class="modal-body"><strong style="color:var(--sage)">14 days free — no credit card required.</strong><br/><span style="font-size:12px;color:var(--ink4)">$9.99/month after your trial. Cancel anytime.</span><br/><br/><div style="background:var(--sage4);border-radius:10px;padding:14px;font-size:13px;color:var(--ink2);line-height:1.9">✦ Unlimited meal photo scans<br/>✦ Cycle sync &amp; hormone nutrition<br/>✦ Perimenopause &amp; menopause mode<br/>✦ Lab trend insights<br/>✦ Food diary PDF export<br/>✦ Full webinar library<br/>✦ Accountability circles<br/>✦ Bone health &amp; body comp tools</div></div>
+    <div class="modal-acts"><button class="modal-ok" onclick="confirmSub()">Start Free Trial →</button><button class="modal-no" onclick="closeStripeModal()">Not now</button></div>
+  </div>
+</div>
+<div class="modal-bg" id="scanLimitModal">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <div style="font-size:40px;margin-bottom:10px">📸</div>
+    <div class="modal-title">Daily scan limit reached</div>
+    <div class="modal-body" style="text-align:left">You've used your 2 free scans for today. Upgrade to Premium for unlimited daily scans.<br/><br/><div style="background:var(--sage4);border-radius:10px;padding:14px;font-size:13px;color:var(--ink2);line-height:1.9">✦ Unlimited meal scans<br/>✦ Cycle sync nutrition<br/>✦ Perimenopause &amp; menopause mode<br/>✦ Lab trend insights<br/>✦ Food diary PDF export<br/>✦ Full webinar library &amp; accountability circles</div></div>
+    <div class="modal-acts"><button class="modal-ok" onclick="closeScanLimitModal();showStripeModal()">Upgrade to Premium →</button><button class="modal-no" onclick="closeScanLimitModal()">Maybe later</button></div>
+  </div>
+</div>
+<div class="modal-bg" id="exportModal">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-title">My Wellness Journal Export</div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:16px;line-height:1.6">Choose a date range and we'll generate a clean PDF you can share with your provider.</p>
+      <div class="fld"><label>Date range</label>
+        <select id="exportRange" onchange="toggleCustomRange()" style="width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none">
+          <option value="7">Last 7 days</option>
+          <option value="14">Last 14 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="custom">Custom range…</option>
+        </select>
+      </div>
+      <div id="customRangeFields" class="hidden">
+        <div class="fld"><label>From</label><input type="date" id="exportFrom" style="width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none"/></div>
+        <div class="fld"><label>To</label><input type="date" id="exportTo" style="width:100%;padding:11px 13px;border:1.5px solid var(--rule);border-radius:10px;font-size:14px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none"/></div>
+      </div>
+    </div>
+    <div class="modal-acts"><button class="modal-ok" onclick="doExportPDF()">Generate PDF ↓</button><button class="modal-no" onclick="closeExportModal()">Cancel</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -463,7 +572,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 const SK='mivara_v1';
 function gs(){try{return JSON.parse(localStorage.getItem(SK))||ds()}catch{return ds()}}
 function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
-function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null}}
+function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null,foodBackground:[],otherFoodBackground:'',cycleSync:false,cycleStartDate:'',cycleLifeStage:'',trialStart:null}}
 let S=gs();let pChrt=null,sChrt=null;
 const ICONS=['🌿','🏃','💊','🐟','🥗','🧘','💪','🍵','📚','🌙','☀️','🥦','🧴','💧','🧠','❤️','🏋️','🎯','✨','🫁','🩸','🧬','🏊','🚴','⛳','🎾','🥊','🏄','🧗'];
 const EXERCISES=[
@@ -487,13 +596,24 @@ function showApp(){document.getElementById('landing').style.display='none';docum
 function switchTab(t){document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('aErr').classList.add('hidden');}
 function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
 function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');const u=users[email.toLowerCase()];if(!u)return showErr('No account found. Create one below.');if(u.pw!==btoa(pass))return showErr('Incorrect password.');const saved=JSON.parse(localStorage.getItem('mivara_state_'+email)||'null')||ds();saved.user={name:u.name,email};S=saved;persist();showApp();toast('Welcome back, '+u.name.split(' ')[0]+'! 👋')}
-function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');if(users[email.toLowerCase()])return showErr('Account already exists — sign in instead.');users[email.toLowerCase()]={name,pw:btoa(pass)};localStorage.setItem('mivara_users',JSON.stringify(users));S=ds();S.user={name,email};S.joinedDate=td();S.habits=starterHabits();persist();showApp();toast('Welcome to Mivara, '+name.split(' ')[0]+'! ✦')}
+function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const users=JSON.parse(localStorage.getItem('mivara_users')||'{}');if(users[email.toLowerCase()])return showErr('Account already exists — sign in instead.');users[email.toLowerCase()]={name,pw:btoa(pass)};localStorage.setItem('mivara_users',JSON.stringify(users));S=ds();S.user={name,email};S.joinedDate=td();S.trialStart=td();S.habits=starterHabits();persist();showOnboarding();}
 function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@mivara.ai'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
 function doSignOut(){persist();S=ds();showLanding();toast('Signed out.')}
 function persist(){if(S.user?.email&&S.user.email!=='guest@mivara.ai'){localStorage.setItem('mivara_state_'+S.user.email,JSON.stringify(S));}else{ss(S);}}
 function starterHabits(){return[{id:uid(),name:'Morning iron supplement + vitamin C',icon:'💊',created:td()},{id:uid(),name:'Eat fatty fish or take omega-3',icon:'🐟',created:td()},{id:uid(),name:'Barley-rice blend at dinner',icon:'🌿',created:td()},{id:uid(),name:'Magnesium glycinate before bed',icon:'🌙',created:td()},];}
 function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('habits',document.querySelector('.ni'));}
-function updateSubUI(){const p=S.subscribed;document.getElementById('upgradePanel').style.display=p?'none':'';document.getElementById('subBadge').textContent=p?'✦ Pro Subscriber':'⚡ Free Trial';document.getElementById('subBadge').className='sub-badge '+(p?'sub-pro':'sub-free');}
+function updateSubUI(){
+  const sub=S.subscribed,trial=isTrialActive(),prem=isPremium(),dl=trialDaysLeft(),rem=Math.max(0,2-scansToday());
+  const badge=document.getElementById('subBadge');
+  const panel=document.getElementById('upgradePanel');
+  const ss=document.getElementById('subSection');
+  if(sub){badge.textContent='✦ Premium';badge.className='sub-badge sub-pro';panel.style.display='none';}
+  else if(trial){badge.textContent='✦ Trial — '+dl+'d left';badge.className='sub-badge sub-pro';panel.innerHTML='<div class="s-up-title">✦ Premium Trial</div><div class="s-up-desc">'+dl+' days left · All features on</div><button class="s-up-btn" onclick="showStripeModal()">Activate — $9.99/mo</button>';panel.style.display='';}
+  else{badge.textContent='⚡ Free Plan';badge.className='sub-badge sub-free';panel.innerHTML='<div class="s-up-title">Free Plan</div><div class="s-up-desc">'+rem+' scan'+(rem===1?'':'s')+' left today</div><button class="s-up-btn" onclick="showStripeModal()">Upgrade to Premium →</button>';panel.style.display='';}
+  if(ss){if(sub){ss.innerHTML='<p style="font-size:13px;color:var(--sage);font-weight:600;line-height:1.6">✦ You have an active Premium subscription. All features unlocked.</p>';}
+  else if(trial){ss.innerHTML='<p style="font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Your 14-day Premium trial has <strong>'+dl+' days remaining</strong>. All features are unlocked.</p><button class="stripe-cta" style="border-radius:11px;font-size:14px;padding:14px" onclick="showStripeModal()">Activate Premium — $9.99/mo</button><p class="stripe-note" style="text-align:center">Keep full access after trial · Cancel anytime</p>';}
+  else{ss.innerHTML='<div style="background:var(--rule2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.7"><strong>Free Plan includes:</strong><br/>✓ 2 meal scans/day · Basic habits · 2 webinars · Community</div><button class="stripe-cta" style="border-radius:11px;font-size:14px;padding:14px" onclick="showStripeModal()">Upgrade to Premium — $9.99/mo</button><p class="stripe-note" style="text-align:center">Secure via Stripe · Cancel anytime</p>';}}
+}
 function goTab(name,btn){['habits','exercise','progress','meals','profile'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==name));document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));if(btn)btn.classList.add('on');if(name==='progress')renderCharts();if(name==='meals')renderMealList();if(name==='exercise')renderExHabits();}
 function renderHabits(){const list=document.getElementById('habitsList');const done=S.completions[td()]||[];if(!S.habits.length){list.innerHTML='<div style="text-align:center;padding:28px;color:var(--ink4);font-size:14px">No habits yet — add your first one below 🌿</div>';updateStats();return;}list.innerHTML='';S.habits.forEach(h=>{const c=done.includes(h.id);const st=streak(h.id);const row=document.createElement('div');row.className='h-row'+(c?' done':'');row.onclick=e=>{if(!e.target.closest('.h-acts'))toggleH(h.id);};row.innerHTML=`<div class="h-chk">${c?'✓':''}</div><span class="h-icon">${h.icon}</span><div class="h-info"><div class="h-name">${h.name}</div><div class="h-meta">Added ${dateLabel(h.created)}</div></div>${st>0?`<div class="h-streak">🔥 ${st}d</div>`:''}<div class="h-acts"><button class="h-del" onclick="delH('${h.id}')">✕</button></div>`;list.appendChild(row);});updateStats();}
 function toggleH(id){const k=td();if(!S.completions[k])S.completions[k]=[];const i=S.completions[k].indexOf(id);if(i>=0)S.completions[k].splice(i,1);else{S.completions[k].push(id);toast('Habit logged ✦');}persist();renderHabits();}
@@ -507,17 +627,103 @@ function togglePop(e){e.stopPropagation();document.getElementById('iconPop').cla
 function pickIcon(i){document.getElementById('selIcon').textContent=i;document.getElementById('iconPop').classList.remove('on');}
 function buildExGrid(){const g=document.getElementById('exGrid');g.innerHTML=EXERCISES.map(ex=>`<div class="ex-chip${S.exercise===ex.id?' sel':''}" onclick="selectEx('${ex.id}')"><div class="ex-chip-icon">${ex.icon}</div><div class="ex-chip-label">${ex.label}</div></div>`).join('');showExProtocol();}
 function selectEx(id){S.exercise=S.exercise===id?null:id;persist();buildExGrid();renderExHabits();if(id)toast('Exercise set to '+EXERCISES.find(e=>e.id===id).label+' 🏃');}
-function showExProtocol(){const el=document.getElementById('exProtocol');const ex=EXERCISES.find(e=>e.id===S.exercise);if(ex){el.innerHTML='<strong>'+ex.icon+' '+ex.label+' Protocol:</strong><br/>'+ex.proto;el.classList.add('on');}else{el.classList.remove('on');}}
+function showExProtocol(){const el=document.getElementById('exProtocol');const ex=EXERCISES.find(e=>e.id===S.exercise);if(ex){el.innerHTML='<strong>'+ex.icon+' '+ex.label+' Mivara Companion Suggestions:</strong><br/>'+ex.proto+'<div class="ai-disclaimer">For personal awareness only — not medical advice.</div>';el.classList.add('on');}else{el.classList.remove('on');}}
 function renderExHabits(){const ex=EXERCISES.find(e=>e.id===S.exercise);const list=document.getElementById('exHabitsList');const qw=document.getElementById('quickExHabits');const exHabits=S.habits.filter(h=>EX_QUICK_HABITS[S.exercise||'']?.some(q=>q===h.name));if(!ex){list.innerHTML='<div style="padding:16px;font-size:13px;color:var(--ink4)">Choose an activity above to see suggested exercise habits.</div>';qw.innerHTML='';return;}const done=S.completions[td()]||[];list.innerHTML=exHabits.length?exHabits.map(h=>{const c=done.includes(h.id),st=streak(h.id);return`<div class="h-row${c?' done':''}" onclick="toggleH('${h.id}')"><div class="h-chk">${c?'✓':''}</div><span class="h-icon">${h.icon}</span><div class="h-info"><div class="h-name">${h.name}</div></div>${st>0?`<div class="h-streak">🔥 ${st}d</div>`:''}</div>`;}).join(''):'<div style="padding:16px;font-size:13px;color:var(--ink4)">Add suggested habits below →</div>';const suggestions=EX_QUICK_HABITS[S.exercise]||[];qw.innerHTML=suggestions.map(s=>{const exists=S.habits.some(h=>h.name===s);return`<button onclick="quickAdd('${s.replace(/'/g,"\\'")}','${s[0]}')" style="padding:8px 14px;border-radius:9px;border:1.5px solid ${exists?'var(--sage)':'var(--rule)'};background:${exists?'var(--sage4)':'white'};color:${exists?'var(--sage)':'var(--ink2)'};font-size:12px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif">${s}${exists?' ✓':' +'}</button>`;}).join('');}
 function quickAdd(name,icon){if(S.habits.some(h=>h.name===name)){toast('Already in your habits!');return;}S.habits.push({id:uid(),name,icon,created:td()});persist();renderHabits();renderExHabits();toast('Habit added ✦');}
 function renderCharts(){const days=[],rates=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.toISOString().split('T')[0];days.push(d.toLocaleDateString('en-US',{weekday:'short'}));const done=(S.completions[k]||[]).length,tot=S.habits.length||1;rates.push(Math.round(done/tot*100));}if(pChrt)pChrt.destroy();pChrt=new Chart(document.getElementById('progChart'),{type:'bar',data:{labels:days,datasets:[{data:rates,backgroundColor:'#3d6b4f',borderRadius:8,label:'%'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#f2efe9'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});if(sChrt)sChrt.destroy();const sl=S.habits.map(h=>h.icon+' '+h.name.slice(0,14)),sv=S.habits.map(h=>streak(h.id));sChrt=new Chart(document.getElementById('strChart'),{type:'bar',data:{labels:sl,datasets:[{data:sv,backgroundColor:'#b8742a',borderRadius:8,label:'Streak'}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11}},grid:{color:'#f2efe9'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});}
 async function analyzeMeal(file){const b64=await toB64(file);const resp=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageData:b64,mimeType:file.type||'image/jpeg'})});if(!resp.ok)throw new Error('Analysis failed');return await resp.json();}
-async function runLandingAnalysis(input){const file=input.files[0];if(!file)return;const ana=document.getElementById('landingAna');const out=document.getElementById('landingOut');const img=document.getElementById('landingImg');const macros=document.getElementById('landingMacros');const insights=document.getElementById('landingInsights');out.classList.remove('on');img.src=await dataUrl(file);out.classList.add('on');ana.classList.add('on');macros.innerHTML='';insights.innerHTML='';try{const r=await analyzeMeal(file);ana.classList.remove('on');macros.innerHTML=[{val:r.calories,unit:'Calories'},{val:r.protein_g+'g',unit:'Protein'},{val:r.carbs_g+'g',unit:'Carbs'},{val:r.fat_g+'g',unit:'Fat'},{val:r.fiber_g+'g',unit:'Fiber'},{val:r.iron_mg+'mg',unit:'Iron'},].map(m=>`<div class="m-box"><div class="m-val">${m.val}</div><div class="m-unit">${m.unit}</div></div>`).join('');const lc=r.ldl_impact==='positive'?'ldl-pos':r.ldl_impact==='negative'?'ldl-neg':'ldl-neu';insights.innerHTML=`<div class="m-i-title">✦ Health Insights</div><div class="ldl-tag ${lc}">LDL Impact: ${r.ldl_impact} — ${r.ldl_note}</div>${(r.insights||[]).map(i=>`<div class="m-i-item"><span>✦</span><span>${i}</span></div>`).join('')}`;}catch(e){ana.classList.remove('on');macros.innerHTML='<div style="color:var(--rose);font-size:13px;grid-column:1/-1">Analysis failed — please try a different photo.</div>';}input.value='';}
-async function runAppMeal(input){const file=input.files[0];if(!file)return;const ana=document.getElementById('appAna');ana.classList.add('on');try{const r=await analyzeMeal(file);S.meals.unshift({id:uid(),name:r.meal_name||'Meal',time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),calories:r.calories,protein:r.protein_g,carbs:r.carbs_g,fat:r.fat_g,fiber:r.fiber_g,iron:r.iron_mg,omega3:r.omega3_mg,ldl_impact:r.ldl_impact,ldl_note:r.ldl_note,insights:r.insights,date:td()});persist();toast('Meal logged ✦');}catch(e){toast('Analysis failed — try again.');}ana.classList.remove('on');renderMealList();input.value='';}
-function renderMealList(){const el=document.getElementById('mealList');const tm=S.meals.filter(m=>m.date===td());if(!tm.length){el.innerHTML='<div style="text-align:center;padding:28px;font-size:13px;color:var(--ink4)">No meals logged today — upload a photo above 📸</div>';return;}el.innerHTML=tm.map(m=>`<div class="me-card"><div class="me-head"><div><div class="me-name">${m.name}</div><div class="me-time">${m.time}</div></div><div class="me-cals">${m.calories} kcal</div></div><div class="me-pills"><span class="pill">🥩 ${m.protein}g protein</span><span class="pill">🌾 ${m.carbs}g carbs</span><span class="pill">🫒 ${m.fat}g fat</span><span class="pill">🌿 ${m.fiber}g fiber</span><span class="pill">🩸 ${m.iron}mg iron</span><span class="pill ${m.ldl_impact==='positive'?'pill-ldl-pos':m.ldl_impact==='negative'?'pill-ldl-neg':''}">LDL ${m.ldl_impact}</span></div>${m.insights?.length?`<div class="me-note">✦ ${m.insights[0]}</div>`:''}</div>`).join('');}
+async function runLandingAnalysis(input){const file=input.files[0];if(!file)return;const ana=document.getElementById('landingAna');const out=document.getElementById('landingOut');const img=document.getElementById('landingImg');const macros=document.getElementById('landingMacros');const insights=document.getElementById('landingInsights');out.classList.remove('on');img.src=await dataUrl(file);out.classList.add('on');ana.classList.add('on');macros.innerHTML='';insights.innerHTML='';try{const r=await analyzeMeal(file);ana.classList.remove('on');macros.innerHTML=[{val:r.calories,unit:'Calories'},{val:r.protein_g+'g',unit:'Protein'},{val:r.carbs_g+'g',unit:'Carbs'},{val:r.fat_g+'g',unit:'Fat'},{val:r.fiber_g+'g',unit:'Fiber'},{val:r.iron_mg+'mg',unit:'Iron'},].map(m=>`<div class="m-box"><div class="m-val">${m.val}</div><div class="m-unit">${m.unit}</div></div>`).join('');const lc=r.ldl_impact==='positive'?'ldl-pos':r.ldl_impact==='negative'?'ldl-neg':'ldl-neu';insights.innerHTML=`<div class="m-i-title">✦ Health Insights</div><div class="ldl-tag ${lc}">LDL Impact: ${r.ldl_impact} — ${r.ldl_note}</div>${(r.insights||[]).map(i=>`<div class="m-i-item"><span>✦</span><span>${i}</span></div>`).join('')}<div class="ai-disclaimer">For personal awareness only — not medical advice.</div>`;}catch(e){ana.classList.remove('on');macros.innerHTML='<div style="color:var(--rose);font-size:13px;grid-column:1/-1">Analysis failed — please try a different photo.</div>';}input.value='';}
+async function runAppMeal(input){const file=input.files[0];if(!file)return;if(!canScan()){showScanLimitModal();input.value='';return;}const ana=document.getElementById('appAna');ana.classList.add('on');try{const r=await analyzeMeal(file);S.meals.unshift({id:uid(),name:r.meal_name||'Meal',time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),calories:r.calories,protein:r.protein_g,carbs:r.carbs_g,fat:r.fat_g,fiber:r.fiber_g,iron:r.iron_mg,omega3:r.omega3_mg,ldl_impact:r.ldl_impact,ldl_note:r.ldl_note,insights:r.insights,date:td()});persist();toast('Meal logged ✦');}catch(e){toast('Analysis failed — try again.');}ana.classList.remove('on');renderMealList();input.value='';}
+function renderMealList(){const el=document.getElementById('mealList');const tm=S.meals.filter(m=>m.date===td());if(!tm.length){el.innerHTML='<div style="text-align:center;padding:28px;font-size:13px;color:var(--ink4)">No meals logged today — upload a photo above 📸</div>';return;}el.innerHTML=tm.map(m=>`<div class="me-card"><div class="me-head"><div><div class="me-name">${m.name}</div><div class="me-time">${m.time}</div></div><div class="me-cals">${m.calories} kcal</div></div><div class="me-pills"><span class="pill">🥩 ${m.protein}g protein</span><span class="pill">🌾 ${m.carbs}g carbs</span><span class="pill">🫒 ${m.fat}g fat</span><span class="pill">🌿 ${m.fiber}g fiber</span><span class="pill">🩸 ${m.iron}mg iron</span><span class="pill ${m.ldl_impact==='positive'?'pill-ldl-pos':m.ldl_impact==='negative'?'pill-ldl-neg':''}">LDL ${m.ldl_impact}</span></div>${m.insights?.length?`<div class="me-note">✦ ${m.insights[0]}</div><div class="ai-disclaimer">For personal awareness only — not medical advice.</div>`:''}<div class="me-clarify"><textarea class="me-clarify-input" id="note-${m.id}" rows="1" placeholder="Add a note or tap 🎤 to speak…" onblur="saveMealNote('${m.id}')">${m.note||''}</textarea><button class="me-mic" id="mic-${m.id}" onclick="toggleMic('${m.id}')">🎤</button></div></div>`).join('');}
+function saveMealNote(id){const el=document.getElementById('note-'+id);if(!el)return;const m=S.meals.find(x=>x.id===id);if(m){m.note=el.value.trim();persist();}}
+let _rec=null;
+function toggleMic(id){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Voice input not supported in this browser.');return;}const btn=document.getElementById('mic-'+id);if(_rec){_rec.stop();_rec=null;if(btn)btn.classList.remove('on');return;}const r=new SR();r.continuous=false;r.interimResults=false;r.onresult=e=>{const t=e.results[0][0].transcript;const inp=document.getElementById('note-'+id);if(inp){inp.value=(inp.value?inp.value+' ':'')+t;saveMealNote(id);}};r.onend=()=>{_rec=null;if(btn)btn.classList.remove('on');};r.onerror=()=>{_rec=null;if(btn)btn.classList.remove('on');toast('Mic error — try again.');};r.start();_rec=r;btn.classList.add('on');}
 function showStripeModal(){document.getElementById('stripeModal').classList.add('on');}
 function closeStripeModal(){document.getElementById('stripeModal').classList.remove('on');}
-function confirmSub(){S.subscribed=true;persist();closeStripeModal();updateSubUI();toast('🎉 Welcome to Mivara Pro!');}
+function confirmSub(){S.subscribed=true;persist();closeStripeModal();updateSubUI();toast('🎉 Welcome to Mivara Premium!');}
+function isPremium(){return S.subscribed||isTrialActive();}
+function isTrialActive(){if(!S.trialStart||S.subscribed)return false;return Math.floor((Date.now()-new Date(S.trialStart+'T00:00:00').getTime())/86400000)<14;}
+function trialDaysLeft(){if(!S.trialStart||S.subscribed)return 0;return Math.max(0,14-Math.floor((Date.now()-new Date(S.trialStart+'T00:00:00').getTime())/86400000));}
+function scansToday(){return S.meals.filter(m=>m.date===td()).length;}
+function canScan(){return isPremium()||scansToday()<2;}
+function showScanLimitModal(){document.getElementById('scanLimitModal').classList.add('on');}
+function closeScanLimitModal(){document.getElementById('scanLimitModal').classList.remove('on');}
+const FOOD_CULTURES=['West African','East African','North African','Caribbean','Latin American / Mexican','South Asian (Indian, Pakistani, Sri Lankan, Bangladeshi)','Southeast Asian (Filipino, Vietnamese, Thai, Indonesian)','East Asian (Chinese, Japanese, Korean)','Middle Eastern / Mediterranean','Indigenous / Native American','Southern American / Soul Food','Eastern European','West European / French / Italian','Brazilian','Ethiopian / Eritrean'];
+function showOnboarding(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('onboardScreen').classList.remove('hidden');document.getElementById('obStep1').classList.remove('hidden');document.getElementById('obStep2').classList.add('hidden');buildFoodChips();}
+function buildFoodChips(){const wrap=document.getElementById('foodChips');const sel=S.foodBackground||[];const allSel=FOOD_CULTURES.every(c=>sel.includes(c));let html=FOOD_CULTURES.map(c=>`<div class="ob-chip${sel.includes(c)?' sel':''}" onclick="obToggleChip(this,'${c.replace(/'/g,"\\'")}')">${c}</div>`).join('');html+=`<div class="ob-chip${allSel?' sel':''}" onclick="obSelectAll()">✅ Select All That Apply</div>`;html+=`<div class="ob-chip${sel.includes('__other__')?' sel':''}" onclick="obToggleOther(this)">✎ Other</div>`;wrap.innerHTML=html;}
+function obToggleChip(el,val){el.classList.toggle('sel');if(!S.foodBackground)S.foodBackground=[];const i=S.foodBackground.indexOf(val);if(i>=0)S.foodBackground.splice(i,1);else S.foodBackground.push(val);}
+function obSelectAll(){const allSel=FOOD_CULTURES.every(c=>(S.foodBackground||[]).includes(c));S.foodBackground=allSel?[]:FOOD_CULTURES.slice();buildFoodChips();document.getElementById('otherWrap').style.display='none';}
+function obToggleOther(el){el.classList.toggle('sel');const show=el.classList.contains('sel');document.getElementById('otherWrap').style.display=show?'block':'none';if(!S.foodBackground)S.foodBackground=[];const i=S.foodBackground.indexOf('__other__');if(show&&i<0)S.foodBackground.push('__other__');else if(!show&&i>=0)S.foodBackground.splice(i,1);}
+function obNext1(){S.otherFoodBackground=document.getElementById('otherFood')?.value.trim()||'';persist();document.getElementById('obStep1').classList.add('hidden');document.getElementById('obStep2').classList.remove('hidden');}
+function toggleCycleFields(){const on=document.getElementById('cycleSyncToggle').checked;document.getElementById('cycleFields').classList.toggle('hidden',!on);}
+function obFinish(){S.cycleSync=document.getElementById('cycleSyncToggle').checked;if(S.cycleSync){S.cycleStartDate=document.getElementById('cycleStartInp').value||'';S.cycleLifeStage=document.getElementById('cycleLifeStageInp').value||'';}persist();document.getElementById('onboardScreen').classList.add('hidden');showApp();toast('Welcome to Mivara, '+S.user.name.split(' ')[0]+'! ✦');}
+function showExportModal(){document.getElementById('exportModal').classList.add('on');}
+function closeExportModal(){document.getElementById('exportModal').classList.remove('on');}
+function toggleCustomRange(){document.getElementById('customRangeFields').classList.toggle('hidden',document.getElementById('exportRange').value!=='custom');}
+function doExportPDF(){if(!isPremium()){closeExportModal();showStripeModal();return;}const range=document.getElementById('exportRange').value;let from,to=td();if(range==='custom'){from=document.getElementById('exportFrom').value;to=document.getElementById('exportTo').value;if(!from||!to){toast('Please select both dates.');return;}}else{const d=new Date();d.setDate(d.getDate()-parseInt(range)+1);from=d.toISOString().split('T')[0];}closeExportModal();generatePDF(from,to);}
+function generatePDF(from,to){
+  if(!window.jspdf){toast('PDF library loading — please try again.');return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF('p','mm','a4');
+  const W=210,H=297,ML=18,MR=18,MT=32,MB=22,CW=174;
+  const sage=[61,107,79],ink=[15,15,15],ink3=[90,90,90],ink4=[154,154,154],rule=[230,227,222],cream=[242,239,233];
+  const firstName=(S.user?.name||'Your').split(' ')[0];
+  const fmt=d=>new Date(d+'T12:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const strip=s=>(s||'').replace(/[^\x00-\x7F]/g,'').trim();
+  let pn=1,y=MT;
+  function hdr(){
+    doc.setFontSize(6.5);doc.setTextColor(...ink4);doc.setFont('helvetica','normal');
+    doc.text('This journal is a personal wellness self-tracker generated by Mivara AI. It is not a medical record, diagnosis, or treatment plan. Please share with your healthcare provider for context only.',W/2,10,{align:'center',maxWidth:CW});
+    doc.setDrawColor(...rule);doc.setLineWidth(0.3);doc.line(ML,14,W-MR,14);
+    doc.setFontSize(7.5);doc.setTextColor(...ink4);
+    doc.text('Mivara\u2122 AI  \xB7  mivara.ai  \xB7  Clarity Starts Here.',W/2,H-8,{align:'center'});
+    doc.text('Page '+pn,W-MR,H-8,{align:'right'});
+    doc.setDrawColor(...rule);doc.line(ML,H-12,W-MR,H-12);
+  }
+  function np(){doc.addPage();pn++;y=MT;hdr();}
+  function chk(n){if(y+n>H-MB)np();}
+  hdr();
+  doc.setFont('helvetica','bold');doc.setFontSize(22);doc.setTextColor(...sage);doc.text('Mivara\u2122',ML,y);
+  const mw=doc.getTextWidth('Mivara');doc.setTextColor(...ink);doc.text(' Wellness Journal',ML+mw,y);y+=8;
+  doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(...ink3);
+  doc.text(firstName+"'s Journal  \xB7  "+fmt(from)+' \u2014 '+fmt(to),ML,y);y+=10;
+  doc.setDrawColor(...rule);doc.setLineWidth(0.4);doc.line(ML,y,W-MR,y);y+=10;
+  const days=[];let cur=new Date(from+'T12:00');const end=new Date(to+'T12:00');
+  while(cur<=end){days.push(cur.toISOString().split('T')[0]);cur.setDate(cur.getDate()+1);}
+  days.forEach(day=>{
+    const meals=S.meals.filter(m=>m.date===day);
+    const done=S.completions[day]||[];
+    const dl=new Date(day+'T12:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    chk(16);
+    doc.setFillColor(...sage);doc.roundedRect(ML,y-3,CW,11,1.5,1.5,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);doc.text(dl,ML+4,y+5);y+=15;
+    if(!meals.length){chk(8);doc.setFont('helvetica','italic');doc.setFontSize(9);doc.setTextColor(...ink4);doc.text('No meals logged this day.',ML+3,y);y+=10;}
+    else{
+      meals.forEach(m=>{
+        chk(22);
+        doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...ink);doc.text(strip(m.name)||'Meal',ML+2,y);
+        doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...ink4);doc.text(m.time||'',W-MR,y,{align:'right'});y+=5;
+        doc.setFontSize(8.5);doc.setTextColor(...ink3);
+        doc.text((m.calories||0)+' kcal  \xB7  '+(m.protein||0)+'g protein  \xB7  '+(m.carbs||0)+'g carbs  \xB7  '+(m.fat||0)+'g fat  \xB7  '+(m.fiber||0)+'g fiber',ML+2,y);y+=4;
+        if(m.note){chk(6);doc.setFontSize(8);doc.setTextColor(...ink4);const nl=doc.splitTextToSize('Note: '+strip(m.note),CW-6);doc.text(nl,ML+2,y);y+=nl.length*4+1;}
+        doc.setDrawColor(...rule);doc.setLineWidth(0.25);doc.line(ML,y+1,W-MR,y+1);y+=6;
+      });
+      chk(12);
+      const tc=meals.reduce((s,m)=>s+(+m.calories||0),0),tp=meals.reduce((s,m)=>s+(+m.protein||0),0),tch=meals.reduce((s,m)=>s+(+m.carbs||0),0),tf=meals.reduce((s,m)=>s+(+m.fat||0),0);
+      doc.setFillColor(...cream);doc.roundedRect(ML,y-2,CW,9,1,1,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...ink);
+      doc.text('Daily Total:  '+tc+' kcal  \xB7  '+tp+'g protein  \xB7  '+tch+'g carbs  \xB7  '+tf+'g fat',ML+4,y+4);y+=13;
+    }
+    chk(10);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(...sage);doc.text('HABITS',ML,y);y+=5;
+    if(!S.habits.length){doc.setFont('helvetica','italic');doc.setFontSize(9);doc.setTextColor(...ink4);doc.text('No habits tracked.',ML+3,y);y+=7;}
+    else{S.habits.forEach(h=>{chk(7);const dn=done.includes(h.id);doc.setFillColor(dn?sage[0]:255,dn?sage[1]:255,dn?sage[2]:255);doc.setDrawColor(dn?sage[0]:180,dn?sage[1]:180,dn?sage[2]:180);doc.roundedRect(ML,y-3,4,4,0.5,0.5,'FD');if(dn){doc.setFont('helvetica','bold');doc.setFontSize(5);doc.setTextColor(255,255,255);doc.text('v',ML+1,y+0.5);}doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(dn?sage[0]:ink[0],dn?sage[1]:ink[1],dn?sage[2]:ink[2]);doc.text(strip(h.name)||'Habit',ML+6,y);y+=6;});y+=2;}
+    chk(32);doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...ink3);doc.text('Notes for my provider:',ML,y);y+=5;
+    doc.setDrawColor(...rule);doc.setLineWidth(0.3);for(let i=0;i<3;i++){doc.line(ML,y+i*8,W-MR,y+i*8);}y+=32;
+  });
+  if(S.labValues&&Object.keys(S.labValues).length){np();doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...sage);doc.text('Lab Values Snapshot',ML,y);y+=10;Object.entries(S.labValues).forEach(([k,v])=>{chk(7);doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(...ink);doc.text(k+': '+v,ML,y);y+=7;});}
+  doc.save('Mivara-Wellness-Journal-'+from+'-to-'+to+'.pdf');
+  toast('Journal downloaded \u2726');
+}
 function td(){return new Date().toISOString().split('T')[0];}
 function dateLabel(d){return new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});}
 function uid(){return Math.random().toString(36).slice(2);}
