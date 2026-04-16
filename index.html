@@ -289,6 +289,36 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 /* Export */
 .export-btn{padding:8px 14px;border-radius:10px;border:1.5px solid var(--rule);background:white;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:'Geist',sans-serif;white-space:nowrap;transition:.15s}
 .export-btn:hover{border-color:var(--sage);color:var(--sage)}
+/* Labs */
+.lab-disclaimer-bar{background:#fef9ee;border:1px solid var(--amber);border-left:4px solid var(--amber);border-radius:10px;padding:13px 16px;font-size:12px;color:var(--ink2);line-height:1.65;margin-bottom:20px}
+.lab-upload-zone{border:2px dashed var(--sage3);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;background:var(--sage4);transition:.2s;position:relative;margin-bottom:20px}
+.lab-upload-zone:hover{border-color:var(--sage);background:var(--sage3)}
+.lab-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.bio-list{display:flex;flex-direction:column;gap:8px}
+.bio-row{background:white;border:1px solid var(--rule);border-radius:11px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
+.bio-name{flex:1;font-size:13px;font-weight:600;color:var(--ink)}
+.bio-val{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--sage)}
+.bio-unit{font-size:11px;color:var(--ink4);margin-left:2px}
+.bio-date{font-size:11px;color:var(--ink4);white-space:nowrap}
+.bio-del{width:26px;height:26px;border-radius:7px;border:none;background:var(--rose2);color:var(--rose);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+.bio-del:hover{background:var(--rose);color:white}
+.lab-sug{background:var(--sage4);border:1px solid var(--sage3);border-radius:14px;padding:18px 20px;margin-bottom:20px}
+.lab-sug-hd{font-size:11px;font-weight:700;color:var(--sage);letter-spacing:.7px;text-transform:uppercase;margin-bottom:8px}
+.lab-sug-body{font-size:14px;color:var(--ink2);line-height:1.65}
+.consent-scroll{max-height:260px;overflow-y:auto;background:var(--rule2);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--ink2);line-height:1.75;margin-bottom:14px;border:1px solid var(--rule)}
+.consent-ck-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;font-size:13px;color:var(--ink2);line-height:1.5}
+.consent-ck-row input[type=checkbox]{margin-top:3px;accent-color:var(--sage);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+.bio-edit-list{max-height:320px;overflow-y:auto}
+.bio-edit-row{display:flex;gap:6px;align-items:center;padding:9px 0;border-bottom:1px solid var(--rule)}
+.bio-edit-row:last-child{border-bottom:none}
+.bio-edit-name{flex:2;font-size:12px;font-weight:500;color:var(--ink);min-width:0;padding-right:4px}
+.bio-edit-inp{padding:6px 8px;border:1.5px solid var(--rule);border-radius:7px;font-size:12px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none;transition:.15s}
+.bio-edit-inp:focus{border-color:var(--sage)}
+.bio-edit-val{width:66px;text-align:right}
+.bio-edit-unit{width:60px}
+.bio-edit-del{width:22px;height:22px;border-radius:6px;border:none;background:var(--rose2);color:var(--rose);cursor:pointer;font-size:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s}
+.bio-edit-del:hover{background:var(--rose);color:white}
+.priv-info{background:var(--rule2);border-radius:11px;padding:14px 16px;font-size:12px;color:var(--ink3);line-height:1.75;margin-bottom:14px}
 </style>
 
 </head>
@@ -472,6 +502,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
       <button class="ni" onclick="goTab('exercise',this)"><span class="ni-icon">🏃</span><span class="ni-label">Exercise</span></button>
       <button class="ni" onclick="goTab('progress',this)"><span class="ni-icon">📈</span><span class="ni-label">Progress</span></button>
       <button class="ni" onclick="goTab('meals',this)"><span class="ni-icon">🍱</span><span class="ni-label">Meal Log</span></button>
+      <button class="ni" onclick="goTab('labs',this)"><span class="ni-icon">🧪</span><span class="ni-label">Lab Tracker</span></button>
       <button class="ni" onclick="goTab('profile',this)"><span class="ni-icon">⚙️</span><span class="ni-label">Profile</span></button>
     </div>
     <div class="s-user" onclick="goTab('profile',null)"><div class="s-uname" id="sUserName">—</div><div class="s-uemail" id="sUserEmail">—</div></div>
@@ -518,12 +549,32 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
       <div class="sec-label">Today's meals</div>
       <div class="meal-entries-l" id="mealList"></div>
     </div>
+    <div id="tab-labs" class="hidden">
+      <div class="pg-head"><div class="pg-title">Lab Tracker</div><div class="pg-sub">Upload lab results — AI extracts biomarkers, never personal info</div></div>
+      <div class="lab-disclaimer-bar"><strong>For personal wellness tracking only.</strong> Mivara is not a medical provider. Biomarker values stored here are for your personal awareness — not for diagnosis, treatment, or clinical use. Always discuss results with your healthcare provider. <a href="#" onclick="goPrivacy();return false" style="color:var(--amber);font-weight:700;text-decoration:none">How We Use Your Health Data →</a></div>
+      <div id="labSug" style="display:none"></div>
+      <div class="lab-upload-zone" id="labZone"><input type="file" accept="image/*,.pdf" id="labFileInp" onchange="handleLabUpload(this)"/><div style="font-size:28px;margin-bottom:8px">🧪</div><div style="font-size:14px;font-weight:600;color:var(--sage);margin-bottom:4px">Upload Lab Results</div><div style="font-size:12px;color:var(--ink4)">JPG, PNG, or PDF · Max 10MB · AI extracts values only — no personal info stored</div></div>
+      <div class="ana-bar-app" id="labAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">Extracting biomarkers…</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">
+        <div class="sec-label" style="margin:0">Saved Biomarkers</div>
+        <button id="deleteAllLabsBtn" onclick="confirmDeleteAllLabs()" style="display:none;padding:5px 11px;border-radius:8px;border:1.5px solid var(--rose);background:white;font-size:11px;font-weight:600;cursor:pointer;color:var(--rose);font-family:'Geist',sans-serif">🗑 Delete All</button>
+      </div>
+      <div class="bio-list" id="bioList"></div>
+    </div>
     <div id="tab-profile" class="hidden">
       <div class="pg-head"><div class="pg-title">Profile</div><div class="pg-sub">Account & subscription</div></div>
       <div class="prof-card"><div class="prof-av" id="profAv">?</div><div style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:3px" id="profName">—</div><div style="font-size:13px;color:var(--ink4);margin-bottom:12px" id="profEmail">—</div><div class="sub-badge sub-free" id="subBadge">⚡ Free Trial</div></div>
       <div class="prof-card">
         <div class="sec-label" style="margin-bottom:14px">Subscription</div>
         <div id="subSection"><p style="font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Unlock unlimited meal AI, full history, exercise suggestions, and lab-linked insights.</p><button class="stripe-cta" style="border-radius:11px;font-size:14px;padding:14px" onclick="showStripeModal()">🔒 Subscribe — $9.99/month</button><p class="stripe-note" style="text-align:center">Secure via Stripe · Cancel anytime</p></div>
+      </div>
+      <div class="prof-card">
+        <div class="sec-label" style="margin-bottom:12px">Privacy &amp; Your Health Data</div>
+        <div class="priv-info"><strong style="color:var(--ink)">How We Use Your Health Data</strong><br/>Your biomarker values are stored only on this device to personalize your wellness suggestions. Mivara does not sell, share, or upload your health data to any third party. Lab images are sent to Google Gemini AI for text extraction only and are not retained by Mivara's servers. This app is a personal wellness self-tracker — it is not a medical record system, health provider, or covered entity under HIPAA. Nothing here constitutes medical advice, diagnosis, or treatment.</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button onclick="downloadMyData()" style="width:100%;padding:10px 14px;border-radius:9px;border:1.5px solid var(--rule);background:white;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:'Geist',sans-serif;text-align:left">📥 Download My Data</button>
+          <button onclick="confirmDeleteAllLabs()" style="width:100%;padding:10px 14px;border-radius:9px;border:1.5px solid var(--rose);background:white;font-size:13px;font-weight:600;cursor:pointer;color:var(--rose);font-family:'Geist',sans-serif;text-align:left">🗑 Delete All My Lab Data</button>
+        </div>
       </div>
       <div class="prof-card"><button class="sign-out" onclick="doSignOut()">Sign out</button></div>
     </div>
@@ -566,13 +617,53 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
     <div class="modal-acts"><button class="modal-ok" onclick="doExportPDF()">Generate PDF ↓</button><button class="modal-no" onclick="closeExportModal()">Cancel</button></div>
   </div>
 </div>
+<div class="modal-bg" id="labConsentModal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-title">Before You Upload</div>
+    <div class="consent-scroll">
+      <strong>What This Feature Does</strong><br/>
+      Mivara's Lab Tracker lets you photograph or upload a PDF of your personal lab results. Our AI reads the document to extract biomarker names, values, and units — and nothing else.<br/><br/>
+      <strong>What We Extract &amp; Store</strong><br/>
+      We extract ONLY: biomarker name (e.g., "LDL Cholesterol"), numeric value (e.g., "127"), and unit (e.g., "mg/dL"). We do NOT extract or store your name, date of birth, provider name, clinic name, address, account number, or any other identifying information.<br/><br/>
+      <strong>Where Your Data Goes</strong><br/>
+      Your uploaded image or PDF is sent to Google Gemini AI for text extraction only. It is not stored on Mivara's servers. The extracted biomarker values are saved locally on your device only — they never leave your device unless you explicitly export them using the Download My Data feature.<br/><br/>
+      <strong>How We Use It</strong><br/>
+      Your saved biomarker values are used solely to personalize the wellness suggestions shown in your Lab Tracker and daily habit reminders. They are never sold, shared, or used for advertising.<br/><br/>
+      <strong>Your Rights</strong><br/>
+      You can delete individual biomarker values or all your lab data at any time from the Lab Tracker tab or Settings &gt; Privacy. Deletion is immediate and permanent.<br/><br/>
+      <strong>Not Medical Advice</strong><br/>
+      Mivara is a personal wellness self-tracker. It is not a medical provider, health plan, or healthcare clearinghouse. Nothing in this app constitutes medical advice, diagnosis, or treatment. Always consult your healthcare provider to interpret your lab results.<br/><br/>
+      <em style="color:var(--ink4)">Your consent is recorded with a timestamp on your device. Consent version 1.0.</em>
+    </div>
+    <div class="consent-ck-row">
+      <input type="checkbox" id="labConsentCheck"/>
+      <label for="labConsentCheck">I have read and understand the above. I consent to Mivara processing my uploaded lab image for biomarker extraction as described.</label>
+    </div>
+    <div class="modal-acts">
+      <button class="modal-ok" onclick="confirmLabConsent()">I Understand &amp; Consent →</button>
+      <button class="modal-no" onclick="cancelLabConsent()">Cancel</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="labReviewModal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">Review Extracted Values</div>
+    <div style="font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:4px">Review the values below. Edit or remove any before saving. Only name, value, and unit are stored — no patient or provider information.</div>
+    <div style="font-size:11px;color:var(--ink4);font-style:italic;margin-bottom:14px;padding-top:4px;border-top:1px solid var(--rule)">For personal awareness only — not medical advice.</div>
+    <div class="bio-edit-list" id="labReviewList"></div>
+    <div class="modal-acts" style="margin-top:16px">
+      <button class="modal-ok" onclick="saveLabValues()">Save These Values</button>
+      <button class="modal-no" onclick="cancelLabReview()">Cancel &amp; Delete All</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
 const SK='mivara_v1';
 function gs(){try{return JSON.parse(localStorage.getItem(SK))||ds()}catch{return ds()}}
 function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
-function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null,foodBackground:[],otherFoodBackground:'',cycleSync:false,cycleStartDate:'',cycleLifeStage:'',trialStart:null}}
+function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null,foodBackground:[],otherFoodBackground:'',cycleSync:false,cycleStartDate:'',cycleLifeStage:'',trialStart:null,labs:[],labConsent:null}}
 let S=gs();let pChrt=null,sChrt=null;
 const ICONS=['🌿','🏃','💊','🐟','🥗','🧘','💪','🍵','📚','🌙','☀️','🥦','🧴','💧','🧠','❤️','🏋️','🎯','✨','🫁','🩸','🧬','🏊','🚴','⛳','🎾','🥊','🏄','🧗'];
 const EXERCISES=[
@@ -614,7 +705,7 @@ function updateSubUI(){
   else if(trial){ss.innerHTML='<p style="font-size:13px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Your 14-day Premium trial has <strong>'+dl+' days remaining</strong>. All features are unlocked.</p><button class="stripe-cta" style="border-radius:11px;font-size:14px;padding:14px" onclick="showStripeModal()">Activate Premium — $9.99/mo</button><p class="stripe-note" style="text-align:center">Keep full access after trial · Cancel anytime</p>';}
   else{ss.innerHTML='<div style="background:var(--rule2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.7"><strong>Free Plan includes:</strong><br/>✓ 2 meal scans/day · Basic habits · 2 webinars · Community</div><button class="stripe-cta" style="border-radius:11px;font-size:14px;padding:14px" onclick="showStripeModal()">Upgrade to Premium — $9.99/mo</button><p class="stripe-note" style="text-align:center">Secure via Stripe · Cancel anytime</p>';}}
 }
-function goTab(name,btn){['habits','exercise','progress','meals','profile'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==name));document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));if(btn)btn.classList.add('on');if(name==='progress')renderCharts();if(name==='meals')renderMealList();if(name==='exercise')renderExHabits();}
+function goTab(name,btn){['habits','exercise','progress','meals','labs','profile'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hidden',t!==name));document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));if(btn)btn.classList.add('on');if(name==='progress')renderCharts();if(name==='meals')renderMealList();if(name==='exercise')renderExHabits();if(name==='labs'){renderBioList();renderLabSug();}}
 function renderHabits(){const list=document.getElementById('habitsList');const done=S.completions[td()]||[];if(!S.habits.length){list.innerHTML='<div style="text-align:center;padding:28px;color:var(--ink4);font-size:14px">No habits yet — add your first one below 🌿</div>';updateStats();return;}list.innerHTML='';S.habits.forEach(h=>{const c=done.includes(h.id);const st=streak(h.id);const row=document.createElement('div');row.className='h-row'+(c?' done':'');row.onclick=e=>{if(!e.target.closest('.h-acts'))toggleH(h.id);};row.innerHTML=`<div class="h-chk">${c?'✓':''}</div><span class="h-icon">${h.icon}</span><div class="h-info"><div class="h-name">${h.name}</div><div class="h-meta">Added ${dateLabel(h.created)}</div></div>${st>0?`<div class="h-streak">🔥 ${st}d</div>`:''}<div class="h-acts"><button class="h-del" onclick="delH('${h.id}')">✕</button></div>`;list.appendChild(row);});updateStats();}
 function toggleH(id){const k=td();if(!S.completions[k])S.completions[k]=[];const i=S.completions[k].indexOf(id);if(i>=0)S.completions[k].splice(i,1);else{S.completions[k].push(id);toast('Habit logged ✦');}persist();renderHabits();}
 function addHabit(){const n=document.getElementById('hInput').value.trim();if(!n)return;const icon=document.getElementById('selIcon').textContent;S.habits.push({id:uid(),name:n,icon,created:td()});persist();document.getElementById('hInput').value='';renderHabits();toast('Habit added 🌿');}
@@ -748,7 +839,170 @@ function toB64(f){
   });
 }
 function dataUrl(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});}
-window.onclick=function(e){if(!e.target.closest('#iconSel'))document.getElementById('iconPop')?.classList.remove('on');if(e.target===document.getElementById('stripeModal'))closeStripeModal();};
+// ── Labs ──────────────────────────────────────────────────────────────────
+const LAB_CONSENT_VER='1.0';
+let _pendingLabFile=null,_pendingBiomarkers=null;
+
+const BIOMARKER_MAP={
+  'ldl':{cat:'Heart Health',tip:'Eat 2+ servings of fatty fish this week. Omega-3s from salmon, mackerel, or sardines directly reduce LDL particle count. Soluble fiber at every meal — oats, barley, and legumes — lowers LDL absorption.'},
+  'hdl':{cat:'Heart Health',tip:'Consistent aerobic activity 150 min/week raises HDL. Avocado and olive oil lift HDL without spiking LDL. Reduce trans fats entirely.'},
+  'total cholesterol':{cat:'Heart Health',tip:'Focus on the ratio of HDL to total cholesterol rather than total alone. Increase plant sterols (fortified foods, almonds, chickpeas) and reduce saturated fat.'},
+  'triglyceride':{cat:'Heart Health',tip:'Reduce added sugar and refined carbs — these directly raise triglycerides. Omega-3 supplements are particularly effective for elevated triglycerides. Limit alcohol.'},
+  'ferritin':{cat:'Iron & Energy',tip:'Take iron supplements with vitamin C to triple absorption. Avoid coffee and calcium within 1 hour of iron. Red meat 2x/week and daily lentils help rebuild stores fastest.'},
+  'hemoglobin':{cat:'Iron & Energy',tip:'Prioritize iron-rich foods: lentils, spinach, tofu, and lean red meat. Pair every iron-containing meal with a vitamin C source. Cooking in cast iron adds meaningful dietary iron.'},
+  'iron':{cat:'Iron & Energy',tip:'Low iron limits exercise capacity and concentration. Take a supplement with orange juice, not tea or coffee. Heme iron from meat absorbs 3–4× better than plant sources.'},
+  'glucose':{cat:'Blood Sugar',tip:'Walk 15 minutes after each meal — this blunts glucose spikes by up to 30%. Choose whole grains over refined. Apple cider vinegar with meals has modest glycemic benefits.'},
+  'hba1c':{cat:'Blood Sugar',tip:'Daily consistency matters more than perfection. Reduce added sugars below 25g/day. Poor sleep raises insulin resistance significantly — prioritize 7–8 hours.'},
+  'vitamin d':{cat:'Bone & Immunity',tip:'15–20 minutes of midday sun on bare skin when possible. Pair vitamin D3 supplements with vitamin K2 for optimal bone absorption. Fatty fish and egg yolks provide dietary D3.'},
+  'calcium':{cat:'Bone Health',tip:'Spread calcium intake across meals — the body absorbs max 500mg at once. Weight-bearing exercise (walking, strength training) builds bone density alongside adequate calcium.'},
+  'magnesium':{cat:'Sleep & Recovery',tip:'Magnesium glycinate 300–400mg at bedtime improves sleep depth and muscle recovery. Dark chocolate, pumpkin seeds, and almonds are rich dietary sources.'},
+  'tsh':{cat:'Thyroid Health',tip:'Selenium-rich foods (Brazil nuts, tuna) support thyroid hormone conversion. Limit raw cruciferous vegetables if thyroid is underactive. Iodized salt provides essential thyroid support.'},
+  'creatinine':{cat:'Kidney Health',tip:'Stay well hydrated — target 8+ cups of water daily. Limit sodium to under 2300mg/day. Prioritize plant proteins where possible and reduce processed meat.'},
+  'potassium':{cat:'Heart & Kidney',tip:'Bananas, avocados, sweet potatoes, and leafy greens are high in potassium. Adequate potassium offsets sodium\'s blood-pressure effects. Consult your provider before supplementing.'},
+  'b12':{cat:'Nerve & Energy',tip:'B12 is found almost exclusively in animal products. If plant-based, supplement daily. B12 absorption declines with age — sublingual tablets absorb better than standard pills.'},
+  'folate':{cat:'Cell Health',tip:'Dark leafy greens, legumes, and fortified grains are top folate sources. Folate works closely with B12 — ensure both are adequate. Cook vegetables minimally to preserve folate.'},
+  'uric acid':{cat:'Joint Health',tip:'Limit high-purine foods: organ meats, shellfish, and beer. Stay well hydrated. Tart cherry juice has modest uric acid-lowering effects in research.'},
+  'cortisol':{cat:'Stress & Recovery',tip:'Morning cortisol peaks naturally — support your rhythm with consistent sleep and wake times. Adaptogens like ashwagandha and rhodiola have evidence for cortisol modulation.'},
+  'testosterone':{cat:'Hormonal Health',tip:'Resistance training 3x/week consistently raises testosterone. Zinc-rich foods (pumpkin seeds, red meat) and adequate sleep (7–9 hrs) are foundational. Reduce chronic stress where possible.'},
+  'estrogen':{cat:'Hormonal Health',tip:'Cruciferous vegetables (broccoli, cauliflower) support healthy estrogen metabolism. Fiber binds excess estrogen for excretion. Regular moderate exercise helps balance estrogen levels.'},
+  'crp':{cat:'Inflammation',tip:'Chronic inflammation is driven by diet, sleep, and stress. Anti-inflammatory priority: omega-3s daily, turmeric with black pepper, and colorful vegetables at every meal.'},
+  'esr':{cat:'Inflammation',tip:'Elevated ESR often responds to anti-inflammatory lifestyle changes. Prioritize sleep quality, reduce ultra-processed foods, and increase omega-3 intake from fish or supplements.'},
+};
+
+function handleLabUpload(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>10*1024*1024){toast('File too large. Max 10MB.');input.value='';return;}
+  if(!S.labConsent||S.labConsent.version!==LAB_CONSENT_VER){_pendingLabFile=file;input.value='';showLabConsentModal();return;}
+  processLabFile(file);input.value='';
+}
+function showLabConsentModal(){document.getElementById('labConsentModal').classList.add('on');document.getElementById('labConsentCheck').checked=false;}
+function cancelLabConsent(){document.getElementById('labConsentModal').classList.remove('on');_pendingLabFile=null;}
+function confirmLabConsent(){
+  if(!document.getElementById('labConsentCheck').checked){toast('Please read and check the consent box to continue.');return;}
+  S.labConsent={timestamp:new Date().toISOString(),version:LAB_CONSENT_VER};
+  persist();
+  document.getElementById('labConsentModal').classList.remove('on');
+  if(_pendingLabFile){const f=_pendingLabFile;_pendingLabFile=null;processLabFile(f);}
+}
+async function processLabFile(file){
+  if(!S.labs)S.labs=[];
+  const ana=document.getElementById('labAna');
+  ana.classList.add('on');
+  try{
+    let b64,mime;
+    if(file.type==='application/pdf'||file.name.toLowerCase().endsWith('.pdf')){
+      b64=await fileToB64Raw(file);mime='application/pdf';
+    }else{
+      b64=await toB64Lab(file);mime=file.type||'image/jpeg';
+    }
+    const resp=await fetch('/api/labs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageData:b64,mimeType:mime})});
+    if(!resp.ok)throw new Error('Extraction failed');
+    const data=await resp.json();
+    ana.classList.remove('on');
+    if(!data.biomarkers||data.biomarkers.length===0){toast('No biomarker values found in this document.');return;}
+    _pendingBiomarkers=data.biomarkers.map(b=>({id:uid(),name:b.name||'',value:b.value||'',unit:b.unit||'',_removed:false}));
+    showLabReviewModal();
+  }catch(e){ana.classList.remove('on');toast('Extraction failed — try a clearer image or PDF.');}
+}
+function fileToB64Raw(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
+function toB64Lab(file){
+  return new Promise((res,rej)=>{
+    const img=new Image();const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');const max=2048;
+      let w=img.width,h=img.height;
+      if(w>max||h>max){if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}}
+      canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const b64=canvas.toDataURL('image/jpeg',0.88).split(',')[1];URL.revokeObjectURL(url);res(b64);
+    };img.onerror=rej;img.src=url;
+  });
+}
+function showLabReviewModal(){
+  if(!_pendingBiomarkers)return;
+  document.getElementById('labReviewList').innerHTML=_pendingBiomarkers.map((b,i)=>`<div class="bio-edit-row" id="brow-${i}"><div class="bio-edit-name">${b.name}</div><input class="bio-edit-inp bio-edit-val" id="bval-${i}" value="${b.value}" type="text"/><input class="bio-edit-inp bio-edit-unit" id="bunit-${i}" value="${b.unit}" type="text"/><button class="bio-edit-del" onclick="removePendingBio(${i})">✕</button></div>`).join('');
+  document.getElementById('labReviewModal').classList.add('on');
+}
+function removePendingBio(i){const row=document.getElementById('brow-'+i);if(row)row.style.display='none';if(_pendingBiomarkers[i])_pendingBiomarkers[i]._removed=true;}
+function saveLabValues(){
+  if(!_pendingBiomarkers)return;
+  if(!S.labs)S.labs=[];
+  let saved=0;
+  _pendingBiomarkers.forEach((b,i)=>{
+    if(b._removed)return;
+    const valEl=document.getElementById('bval-'+i);
+    const unitEl=document.getElementById('bunit-'+i);
+    const value=(valEl?valEl.value:b.value).trim();
+    const unit=(unitEl?unitEl.value:b.unit).trim();
+    if(!b.name||!value)return;
+    const entry={id:uid(),biomarker_name:b.name,biomarker_value:value,biomarker_unit:unit,date_entered:td(),source:'lab_upload'};
+    const existIdx=S.labs.findIndex(l=>l.biomarker_name.toLowerCase()===b.name.toLowerCase());
+    if(existIdx>=0)S.labs[existIdx]=entry;else S.labs.push(entry);
+    saved++;
+  });
+  persist();
+  document.getElementById('labReviewModal').classList.remove('on');
+  _pendingBiomarkers=null;
+  renderBioList();renderLabSug();
+  toast(saved+' biomarker'+(saved!==1?'s':'')+' saved ✦');
+}
+function cancelLabReview(){document.getElementById('labReviewModal').classList.remove('on');_pendingBiomarkers=null;}
+function renderBioList(){
+  if(!S.labs)S.labs=[];
+  const list=document.getElementById('bioList');
+  const delBtn=document.getElementById('deleteAllLabsBtn');
+  if(!list)return;
+  if(!S.labs.length){list.innerHTML='<div style="text-align:center;padding:32px;font-size:13px;color:var(--ink4)">No biomarkers saved yet — upload a lab report above 🧪</div>';if(delBtn)delBtn.style.display='none';return;}
+  if(delBtn)delBtn.style.display='';
+  list.innerHTML=S.labs.map(b=>`<div class="bio-row"><div class="bio-name">${b.biomarker_name}</div><div><span class="bio-val">${b.biomarker_value}</span><span class="bio-unit">${b.biomarker_unit}</span></div><div class="bio-date">${b.date_entered}</div><button class="bio-del" onclick="deleteOneLab('${b.id}')">✕</button></div>`).join('');
+}
+function deleteOneLab(id){
+  if(!S.labs)return;
+  // 3-attempt deletion with verification
+  let attempts=0;
+  function attempt(){attempts++;S.labs=S.labs.filter(b=>b.id!==id);persist();if(S.labs.some(b=>b.id===id)&&attempts<3){attempt();}else{renderBioList();renderLabSug();toast('Biomarker deleted.');}}
+  attempt();
+}
+function confirmDeleteAllLabs(){
+  if(!(S.labs&&S.labs.length)){toast('No lab data to delete.');return;}
+  // Show inline confirmation via toast-style confirm
+  if(!confirm('Delete all saved lab data permanently? This cannot be undone.')){return;}
+  deleteAllLabs();
+}
+function deleteAllLabs(){
+  S.labs=[];persist();renderBioList();renderLabSug();toast('All lab data deleted.');
+}
+function renderLabSug(){
+  if(!S.labs)S.labs=[];
+  const el=document.getElementById('labSug');if(!el)return;
+  if(!S.labs.length){el.style.display='none';return;}
+  // Daily rotation: pick different biomarker each day based on stored labs
+  const dayIdx=Math.floor(Date.now()/86400000);
+  let match=null;
+  // Try to find a biomarker we have a suggestion for
+  const shuffled=[...S.labs];shuffled.sort((_,__)=>0);// stable order
+  for(let offset=0;offset<shuffled.length;offset++){
+    const lab=shuffled[(dayIdx+offset)%shuffled.length];
+    const name=lab.biomarker_name.toLowerCase();
+    for(const [key,data] of Object.entries(BIOMARKER_MAP)){if(name.includes(key)){match={biomarker:lab.biomarker_name,...data};break;}}
+    if(match)break;
+  }
+  if(!match){
+    const lab=shuffled[dayIdx%shuffled.length];
+    match={biomarker:lab.biomarker_name,cat:'Wellness',tip:'Track your biomarkers consistently over time. Small daily changes — diet, movement, sleep, stress management — compound into measurable improvements in your lab values.'};
+  }
+  el.style.display='';
+  el.innerHTML=`<div class="lab-sug"><div class="lab-sug-hd">✦ Today's Focus · ${match.cat}</div><div class="lab-sug-body">${match.tip}</div><div class="ai-disclaimer">Personalized based on your saved value: ${match.biomarker}. For personal awareness only — not medical advice.</div></div>`;
+}
+function downloadMyData(){
+  const data={exported:new Date().toISOString(),labs:(S.labs||[]),consent:S.labConsent,habits:S.habits,meals:S.meals};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Mivara-My-Data-'+td()+'.json';a.click();URL.revokeObjectURL(a.href);
+  toast('Data downloaded 📥');
+}
+function goPrivacy(){const btns=[...document.querySelectorAll('.ni')];const pb=btns.find(el=>el.textContent.includes('Profile'));goTab('profile',pb);}
+// ── End Labs ──────────────────────────────────────────────────────────────
+window.onclick=function(e){if(!e.target.closest('#iconSel'))document.getElementById('iconPop')?.classList.remove('on');if(e.target===document.getElementById('stripeModal'))closeStripeModal();if(e.target===document.getElementById('labConsentModal'))cancelLabConsent();if(e.target===document.getElementById('labReviewModal'))cancelLabReview();};
 if(S.user)showApp();else showLanding();
 </script>
 
