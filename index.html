@@ -301,14 +301,27 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 .lab-upload-zone{border:2px dashed var(--sage3);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;background:var(--sage4);transition:.2s;position:relative;margin-bottom:20px}
 .lab-upload-zone:hover{border-color:var(--sage);background:var(--sage3)}
 .lab-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.bio-list{display:flex;flex-direction:column;gap:8px}
+.bio-list{display:flex;flex-direction:column;gap:10px}
 .bio-row{background:white;border:1px solid var(--rule);border-radius:11px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
 .bio-name{flex:1;font-size:13px;font-weight:600;color:var(--ink)}
-.bio-val{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--sage)}
+.bio-val{font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1;color:var(--sage)}
 .bio-unit{font-size:11px;color:var(--ink4);margin-left:2px}
 .bio-date{font-size:11px;color:var(--ink4);white-space:nowrap}
 .bio-del{width:26px;height:26px;border-radius:7px;border:none;background:var(--rose2);color:var(--rose);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
 .bio-del:hover{background:var(--rose);color:white}
+.bio-row-open{border-radius:11px 11px 0 0;border-bottom:none;box-shadow:none}
+.bio-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;letter-spacing:.3px;flex-shrink:0;align-self:center}
+.bio-status-in{background:#dcfce7;color:#15803d}
+.bio-status-border{background:#fef3c7;color:#b45309}
+.bio-status-out{background:#fee2e2;color:#b91c1c}
+.bio-wellness{border:1px solid;border-top:none;border-radius:0 0 11px 11px;padding:13px 16px 14px;font-size:13px;color:var(--ink2);line-height:1.65;margin-bottom:0}
+.bio-wellness-border{background:#fffbf0;border-color:#fde68a}
+.bio-wellness-out{background:#fff5f5;border-color:#fecaca}
+.bio-wellness-hd{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.bio-wellness-hd-border{color:#b45309}
+.bio-wellness-hd-out{color:#b91c1c}
+.bio-wellness-disc{font-size:11px;color:var(--ink4);font-style:italic;margin-top:10px;line-height:1.55;border-top:1px solid rgba(0,0,0,.07);padding-top:9px}
+.bio-card{display:flex;flex-direction:column;margin-bottom:0}
 .lab-sug{background:var(--sage4);border:1px solid var(--sage3);border-radius:14px;padding:18px 20px;margin-bottom:20px}
 .lab-sug-hd{font-size:11px;font-weight:700;color:var(--sage);letter-spacing:.7px;text-transform:uppercase;margin-bottom:8px}
 .lab-sug-body{font-size:14px;color:var(--ink2);line-height:1.65}
@@ -675,6 +688,10 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
     <div class="modal-title">Review Extracted Values</div>
     <div style="font-size:12px;color:var(--ink3);line-height:1.5;margin-bottom:4px">Review the values below. Edit or remove any before saving. Only name, value, and unit are stored — no patient or provider information.</div>
     <div style="font-size:11px;color:var(--ink4);font-style:italic;margin-bottom:14px;padding-top:4px;border-top:1px solid var(--rule)">For personal awareness only — not medical advice.</div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:600;color:var(--ink2);display:block;margin-bottom:5px">Date of lab work (when blood was drawn)</label>
+      <input type="date" id="labWorkDate" style="width:100%;padding:10px 12px;border:1.5px solid var(--rule);border-radius:9px;font-size:13px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none;box-sizing:border-box"/>
+    </div>
     <div class="bio-edit-list" id="labReviewList"></div>
     <div class="modal-acts" style="margin-top:16px">
       <button class="modal-ok" onclick="saveLabValues()">Save These Values</button>
@@ -898,6 +915,120 @@ function dataUrl(f){return new Promise((res,rej)=>{const r=new FileReader();r.on
 const LAB_CONSENT_VER='1.0';
 let _pendingLabFile=null,_pendingBiomarkers=null;
 
+const BIOMARKER_RANGES={
+  'wbc':{low:4.5,high:11.0,borderLow:3.5,borderHigh:13.0},
+  'rbc':{low:3.8,high:5.5,borderLow:3.5,borderHigh:6.0},
+  'hemoglobin':{low:11.5,high:17.5,borderLow:10.0,borderHigh:18.5},
+  'hematocrit':{low:36,high:53,borderLow:30,borderHigh:55},
+  'platelet':{low:150,high:400,borderLow:100,borderHigh:450},
+  'ferritin':{low:12,high:300,borderLow:10,borderHigh:350},
+  'glucose':{low:70,high:100,borderHigh:125},
+  'hba1c':{low:4.0,high:5.6,borderHigh:6.4},
+  'ldl':{low:0,high:99,borderHigh:159},
+  'hdl':{low:60,high:999,borderLow:40},
+  'total cholesterol':{low:0,high:199,borderHigh:239},
+  'triglyceride':{low:0,high:149,borderHigh:199},
+  'tsh':{low:0.4,high:4.0,borderLow:0.1,borderHigh:10.0},
+  'vitamin d':{low:30,high:100,borderLow:20},
+  'b12':{low:300,high:900,borderLow:200},
+  'folate':{low:2.7,high:17,borderLow:2.0},
+  'magnesium':{low:1.7,high:2.2,borderLow:1.5,borderHigh:2.5},
+  'calcium':{low:8.5,high:10.2,borderLow:8.0,borderHigh:10.5},
+  'potassium':{low:3.5,high:5.0,borderLow:3.0,borderHigh:5.5},
+  'sodium':{low:136,high:145,borderLow:130,borderHigh:148},
+  'creatinine':{low:0.6,high:1.2,borderHigh:1.5},
+  'bun':{low:7,high:25,borderHigh:30},
+  'iron':{low:60,high:170,borderLow:40,borderHigh:200},
+  'uric acid':{low:2.5,high:7.2,borderHigh:8.0},
+  'crp':{low:0,high:1.0,borderHigh:3.0},
+  'esr':{low:0,high:20,borderHigh:40},
+};
+const BIOMARKER_WELLNESS={
+  'wbc':{
+    foods:['Vitamin C-rich foods like bell peppers, citrus, and kiwi that many people find supportive for immune resilience','Zinc from pumpkin seeds, chickpeas, and lean poultry','Fermented foods like yogurt, kefir, and miso that may support gut-immune balance'],
+    habits:['Consistent 7–8 hours of sleep is often worth prioritizing for immune function','Gentle daily movement — walking, stretching — may complement healthy immune activity','Worth discussing with your provider if this value persists outside range']
+  },
+  'rbc':{
+    foods:['Iron-rich foods like lentils, spinach, and lean red meat that many people find helpful','Vitamin C alongside iron sources to support absorption','B12 and folate from eggs, leafy greens, and fortified foods'],
+    habits:['Regular moderate exercise may support healthy red blood cell production','Staying well hydrated is commonly recommended','Worth discussing your numbers and any supplementation options with your provider']
+  },
+  'hemoglobin':{
+    foods:['Lentils, dark leafy greens, and lean meat that many find supportive for iron levels','Pairing iron-containing meals with vitamin C — orange juice, bell peppers, or tomatoes','Cooking in cast iron pans may add a meaningful amount of dietary iron'],
+    habits:['Avoid coffee or tea within an hour of iron-rich meals, as they may reduce absorption','Regular movement supports circulation and oxygen delivery','Worth discussing with your provider to understand the direction and cause']
+  },
+  'ferritin':{
+    foods:['Red meat and organ meats like liver are among the richest sources of heme iron','Plant-based iron from lentils, tofu, and spinach paired with vitamin C at the same meal','Many people find daily fortified cereals a convenient way to support iron stores'],
+    habits:['Avoid calcium supplements within 1–2 hours of iron-rich meals','Vitamin C at each iron-rich meal may meaningfully support absorption','Worth discussing a supplement plan with your provider if stores remain low']
+  },
+  'glucose':{
+    foods:['Fiber-rich foods — oats, legumes, and non-starchy vegetables — that many find help moderate glucose response','Apple cider vinegar with meals has shown modest effects on post-meal glucose in some research','Cinnamon is a flavorful spice many people enjoy that may have modest glucose-supportive properties'],
+    habits:['A 10–15 minute walk after meals may meaningfully reduce post-meal glucose spikes','Consistent meal timing — eating at regular intervals — is commonly recommended','Prioritizing 7–8 hours of sleep may support healthy insulin sensitivity']
+  },
+  'hba1c':{
+    foods:['Reducing added sugars to under 25g/day is a widely supported dietary goal','Whole grains (oats, barley, quinoa) rather than refined carbs that many find helpful for blood sugar balance','Non-starchy vegetables at every meal — these may support a healthier glucose response'],
+    habits:['Daily consistent movement — even 30 minutes of walking — may support healthy HbA1c over time','Sleep quality meaningfully affects insulin sensitivity — 7–8 hours is widely recommended','Worth discussing monitoring frequency and personal goals with your provider']
+  },
+  'ldl':{
+    foods:['Soluble fiber from oats, barley, and legumes that many find supportive for healthy LDL levels','Fatty fish like salmon or mackerel 2x weekly — omega-3s may support lipid balance','Plant sterols from almonds, avocado, and fortified foods that many people incorporate for lipid support'],
+    habits:['Aerobic exercise 150 min/week is broadly recommended for cardiovascular health','Reducing saturated and trans fats is often worth discussing with your provider','Stress management and quality sleep may complement dietary changes']
+  },
+  'hdl':{
+    foods:['Avocado, olive oil, and nuts that many find support healthy HDL levels','Fatty fish rich in omega-3s — salmon, sardines, mackerel','Minimizing trans fats and refined carbohydrates is widely recommended'],
+    habits:['Consistent aerobic activity is one of the most evidence-supported ways to raise HDL','Even moderate exercise — brisk walking 30 min/day — may support HDL over time','Worth discussing your full lipid panel picture with your provider']
+  },
+  'total cholesterol':{
+    foods:['Plant sterols from almonds, chickpeas, and fortified foods','Soluble fiber from oats and beans that many find helps reduce cholesterol absorption','Olive oil and avocado in place of saturated fats that many people find a helpful swap'],
+    habits:['Regular aerobic exercise is broadly recommended for healthy lipid profiles','Review your saturated fat intake with your provider or a registered dietitian','Stress and sleep both influence lipid metabolism — worth attending to both']
+  },
+  'triglyceride':{
+    foods:['Reducing added sugars and refined carbs is the most evidence-backed dietary change for triglycerides','Omega-3 fatty acids from fatty fish, walnuts, or supplements that many find supportive','Limiting alcohol, which directly raises triglycerides, is commonly recommended'],
+    habits:['Even modest movement increases through daily walking may noticeably affect triglyceride levels','Consistent aerobic exercise 3–5x/week is broadly recommended','Worth discussing whether omega-3 supplementation may be appropriate with your provider']
+  },
+  'tsh':{
+    foods:['Selenium-rich foods like Brazil nuts (1–2/day) and tuna that many find support thyroid hormone conversion','Iodized salt and seafood that provide essential iodine for thyroid function','Cooking cruciferous vegetables (broccoli, kale) rather than eating them raw may reduce any potential impact on thyroid'],
+    habits:['Consistent sleep and stress management are broadly supportive of hormonal balance','Thyroid function often requires ongoing monitoring — regular check-ins with your provider are worthwhile','Medication timing and adherence, if prescribed, is worth reviewing with your provider']
+  },
+  'vitamin d':{
+    foods:['Fatty fish like salmon, mackerel, and sardines are among the richest food sources of vitamin D','Egg yolks, fortified dairy, and UV-exposed mushrooms','Many people find a D3 supplement paired with K2 a convenient way to support levels — worth discussing dosage with your provider'],
+    habits:['10–20 minutes of midday sun on bare skin when safe and accessible','Vitamin D absorption is supported by pairing supplements with a fat-containing meal','Blood levels often take 2–3 months to respond to supplementation — consistent daily use is worth prioritizing']
+  },
+  'b12':{
+    foods:['Meat, fish, eggs, and dairy are the primary dietary sources of B12','Nutritional yeast and B12-fortified plant milks that many vegans and vegetarians rely on','Sublingual B12 supplements that many people find absorb more readily than standard tablets'],
+    habits:['B12 absorption naturally declines with age — worth discussing testing frequency with your provider','If plant-based, a daily B12 supplement is broadly recommended by most nutrition authorities','Worth discussing with your provider if levels don\'t respond to dietary or supplement changes']
+  },
+  'folate':{
+    foods:['Dark leafy greens — spinach, romaine, asparagus — that many find the most convenient folate sources','Lentils and beans that are among the most folate-dense plant foods','Fortified grains and cereals that many find a practical daily source'],
+    habits:['Minimal cooking preserves more folate — light steaming rather than boiling is worth trying','Folate and B12 work closely together — worth checking both with your provider','If planning a pregnancy, folate requirements increase meaningfully — worth discussing with your provider']
+  },
+  'magnesium':{
+    foods:['Dark chocolate, pumpkin seeds, and almonds that many find enjoyable daily magnesium sources','Dark leafy greens like spinach and Swiss chard','Whole grains and legumes that contribute meaningfully to daily magnesium intake'],
+    habits:['Magnesium glycinate 200–400mg at bedtime is commonly used for sleep and recovery — worth discussing with your provider','Reducing alcohol and excess caffeine may support magnesium retention','Many people find magnesium supportive for sleep quality and muscle recovery']
+  },
+  'calcium':{
+    foods:['Dairy products, fortified plant milks, and canned fish with bones that many find reliable calcium sources','Dark leafy greens like kale and bok choy as plant-based calcium sources','Spreading calcium intake across meals (max ~500mg per sitting) may support better absorption'],
+    habits:['Weight-bearing exercise — walking, strength training — supports bone density alongside calcium intake','Vitamin D supports calcium absorption — worth ensuring both are adequate','Excessive sodium and caffeine may increase calcium excretion — worth moderating']
+  },
+  'crp':{
+    foods:['Omega-3 fatty acids from fatty fish, walnuts, and flaxseed that many find anti-inflammatory','Colorful vegetables and fruits rich in polyphenols and antioxidants','Turmeric with black pepper that many people incorporate for potential anti-inflammatory properties'],
+    habits:['Sleep quality is closely linked to inflammatory markers — 7–8 hours may support CRP levels','Regular moderate exercise may help reduce chronic low-grade inflammation','Stress reduction practices — breathing, mindfulness, nature exposure — are broadly worth exploring']
+  },
+  'iron':{
+    foods:['Heme iron from lean red meat and fish absorbs 3–4× better than plant sources','Plant iron from lentils, spinach, and tofu paired with vitamin C at the same meal','Avoiding tea, coffee, and calcium within 1–2 hours of iron-rich meals may support absorption'],
+    habits:['Cooking with cast iron pans may meaningfully add dietary iron to foods','Consistent supplementation alongside vitamin C is worth exploring if levels are low','Worth discussing testing ferritin (stored iron) as well — serum iron alone can be misleading']
+  },
+  'uric acid':{
+    foods:['Tart cherry juice that some research suggests may have modest uric acid-lowering effects','Staying very well hydrated to support uric acid excretion','Limiting organ meats, shellfish, and anchovies (high-purine foods) that are commonly recommended'],
+    habits:['Limiting alcohol, especially beer, is broadly recommended for uric acid management','Modest, steady weight management is often worth discussing with your provider','Gradual dietary changes are recommended — sudden shifts can temporarily raise uric acid']
+  },
+  'potassium':{
+    foods:['Bananas, avocados, and sweet potatoes that many find the most accessible potassium sources','White beans, lentils, and edamame that are among the highest plant sources','Leafy greens and winter squash that contribute meaningfully to potassium intake'],
+    habits:['Potassium helps offset sodium\'s blood pressure effects — both are worth attending to','Supplementing potassium without provider guidance is not generally recommended — worth discussing first','Staying well hydrated supports healthy potassium balance']
+  },
+  'creatinine':{
+    foods:['Staying well hydrated — 8+ cups of water daily — is broadly recommended for kidney health','Plant proteins (legumes, tofu) rather than large amounts of animal protein may be supportive','Reducing sodium to under 2300mg/day is widely recommended for kidney and blood pressure health'],
+    habits:['Regular check-ins with your provider are worth prioritizing if creatinine is trending','Avoiding NSAIDs (ibuprofen, naproxen) without medical guidance is commonly recommended','Staying active with moderate (not extreme) exercise is broadly supportive']
+  },
+};
 const BIOMARKER_MAP={
   'ldl':{cat:'Heart Health',tip:'Eat 2+ servings of fatty fish this week. Omega-3s from salmon, mackerel, or sardines directly reduce LDL particle count. Soluble fiber at every meal — oats, barley, and legumes — lowers LDL absorption.'},
   'hdl':{cat:'Heart Health',tip:'Consistent aerobic activity 150 min/week raises HDL. Avocado and olive oil lift HDL without spiking LDL. Reduce trans fats entirely.'},
@@ -924,6 +1055,34 @@ const BIOMARKER_MAP={
   'esr':{cat:'Inflammation',tip:'Elevated ESR often responds to anti-inflammatory lifestyle changes. Prioritize sleep quality, reduce ultra-processed foods, and increase omega-3 intake from fish or supplements.'},
 };
 
+function checkBiomarkerStatus(name,value){
+  const num=parseFloat(value);
+  if(isNaN(num))return null;
+  const nameL=name.toLowerCase();
+  const key=Object.keys(BIOMARKER_RANGES).find(k=>nameL.includes(k));
+  if(!key)return null;
+  const r=BIOMARKER_RANGES[key];
+  if(num>=r.low&&num<=r.high)return'in';
+  if(r.borderLow!==undefined&&num>=r.borderLow&&num<r.low)return'borderline';
+  if(r.borderHigh!==undefined&&num>r.high&&num<=r.borderHigh)return'borderline';
+  return'out';
+}
+function getBioWellness(name){
+  const nameL=name.toLowerCase();
+  const entry=Object.entries(BIOMARKER_WELLNESS).find(([k])=>nameL.includes(k));
+  return entry?entry[1]:null;
+}
+function wellnessCard(b,status){
+  const w=getBioWellness(b.biomarker_name);
+  if(!w)return'';
+  const isBorder=status==='borderline';
+  const cls=isBorder?'bio-wellness bio-wellness-border':'bio-wellness bio-wellness-out';
+  const hdCls=isBorder?'bio-wellness-hd bio-wellness-hd-border':'bio-wellness-hd bio-wellness-hd-out';
+  const title=isBorder?'Borderline · worth discussing · '+b.biomarker_name:'Outside reference range · worth discussing · '+b.biomarker_name;
+  const foodsHtml=w.foods.map(f=>`<li style="margin-bottom:3px">${f}</li>`).join('');
+  const habitsHtml=w.habits.map(h=>`<li style="margin-bottom:3px">${h}</li>`).join('');
+  return`<div class="${cls}"><div class="${hdCls}">${title}</div><div><strong style="font-size:11px;font-weight:700;color:var(--ink2);display:block;margin-bottom:4px">Foods many people find supportive</strong><ul style="margin:0 0 10px 15px;padding:0;color:var(--ink2);line-height:1.65">${foodsHtml}</ul><strong style="font-size:11px;font-weight:700;color:var(--ink2);display:block;margin-bottom:4px">Habits worth exploring</strong><ul style="margin:0 0 0 15px;padding:0;color:var(--ink2);line-height:1.65">${habitsHtml}</ul></div><div class="bio-wellness-disc">For personal awareness only — not medical advice. Always consult your healthcare provider before changing your diet, supplements, or lifestyle. Mivara does not diagnose, treat, or prescribe.</div></div>`;
+}
 function handleLabUpload(input){
   const file=input.files[0];
   console.log('[Labs] handleLabUpload — file:', file?.name, file?.type, file?.size);
@@ -1002,6 +1161,7 @@ function toB64Lab(file){
 function showLabReviewModal(){
   console.log('[Labs] showLabReviewModal — biomarkers count:', _pendingBiomarkers?.length);
   if(!_pendingBiomarkers)return;
+  document.getElementById('labWorkDate').value=td();
   document.getElementById('labReviewList').innerHTML=_pendingBiomarkers.map((b,i)=>`<div class="bio-edit-row" id="brow-${i}"><div class="bio-edit-name">${b.name}</div><input class="bio-edit-inp bio-edit-val" id="bval-${i}" value="${b.value}" type="text"/><input class="bio-edit-inp bio-edit-unit" id="bunit-${i}" value="${b.unit}" type="text"/><button class="bio-edit-del" onclick="removePendingBio(${i})">✕</button></div>`).join('');
   document.getElementById('labReviewModal').classList.add('on');
   console.log('[Labs] review modal opened');
@@ -1010,6 +1170,7 @@ function removePendingBio(i){const row=document.getElementById('brow-'+i);if(row
 function saveLabValues(){
   if(!_pendingBiomarkers)return;
   if(!S.labs)S.labs=[];
+  const dateDrawn=document.getElementById('labWorkDate')?.value||td();
   let saved=0;
   _pendingBiomarkers.forEach((b,i)=>{
     if(b._removed)return;
@@ -1019,7 +1180,7 @@ function saveLabValues(){
     const unit=(unitEl?unitEl.value:b.unit).trim();
     if(!b.name||!value)return;
     const existIdx=S.labs.findIndex(l=>l.biomarker_name.toLowerCase()===b.name.toLowerCase());
-    const entry={id:existIdx>=0?S.labs[existIdx].id:uid(),biomarker_name:b.name,biomarker_value:value,biomarker_unit:unit,date_entered:td(),source:'lab_upload'};
+    const entry={id:existIdx>=0?S.labs[existIdx].id:uid(),biomarker_name:b.name,biomarker_value:value,biomarker_unit:unit,date_drawn:dateDrawn,date_entered:td(),source:'lab_upload'};
     if(existIdx>=0)S.labs[existIdx]=entry;else S.labs.push(entry);
     if(sbUserId){
       const row={user_id:sbUserId,marker_name:entry.biomarker_name,marker_value:entry.biomarker_value,unit:entry.biomarker_unit};
@@ -1045,7 +1206,17 @@ function renderBioList(){
   if(!list)return;
   if(!S.labs.length){list.innerHTML='<div style="text-align:center;padding:32px;font-size:13px;color:var(--ink4)">No biomarkers saved yet — upload a lab report above 🧪</div>';if(delBtn)delBtn.style.display='none';return;}
   if(delBtn)delBtn.style.display='';
-  list.innerHTML=S.labs.map(b=>`<div class="bio-row"><div class="bio-name">${b.biomarker_name}</div><div><span class="bio-val">${b.biomarker_value}</span><span class="bio-unit">${b.biomarker_unit}</span></div><div class="bio-date">${b.date_entered}</div><button class="bio-del" onclick="deleteOneLab('${b.id}')">✕</button></div>`).join('');
+  list.innerHTML=S.labs.map(b=>{
+    const st=checkBiomarkerStatus(b.biomarker_name,b.biomarker_value);
+    const displayDate=b.date_drawn?'Drawn '+b.date_drawn:(b.date_entered||'');
+    const hasCard=(st==='borderline'||st==='out')&&getBioWellness(b.biomarker_name);
+    const rowCls=hasCard?'bio-row bio-row-open':'bio-row';
+    let pill='';
+    if(st==='in')pill='<span class="bio-status bio-status-in">● In range</span>';
+    else if(st==='borderline')pill='<span class="bio-status bio-status-border">⚠ Borderline</span>';
+    else if(st==='out')pill='<span class="bio-status bio-status-out">✕ Out of range</span>';
+    return`<div class="bio-card"><div class="${rowCls}"><div class="bio-name">${b.biomarker_name}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><div style="display:flex;align-items:baseline;gap:3px"><span class="bio-val">${b.biomarker_value}</span><span class="bio-unit">${b.biomarker_unit}</span></div>${pill}</div><div class="bio-date">${displayDate}</div><button class="bio-del" onclick="deleteOneLab('${b.id}')">✕</button></div>${hasCard?wellnessCard(b,st):''}</div>`;
+  }).join('');
 }
 function deleteOneLab(id){
   if(!S.labs)return;
