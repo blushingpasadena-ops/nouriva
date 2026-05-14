@@ -37,7 +37,7 @@ export default async function handler(req, res) {
                 }
               },
               {
-                text: 'You are a medical document parser. Extract ALL biomarker test results from this lab report. Return ONLY a valid JSON array — no markdown, no backticks, no explanation, no extra text before or after. Each item must have exactly three keys: "name" (short readable string, e.g. "LDL Cholesterol"), "value" (numeric result as a string, e.g. "127"), "unit" (e.g. "mg/dL"). Skip any test with no numeric result. If no results found, return []. Example output: [{"name":"LDL Cholesterol","value":"127","unit":"mg/dL"},{"name":"HDL Cholesterol","value":"62","unit":"mg/dL"}]'
+                text: 'Extract all biomarker results from this lab report. Respond with a raw JSON array only. Do not use markdown. Do not use code blocks. Do not wrap in backticks. Do not add any text before or after the array. Start your response with [ and end with ]. Each element must have exactly three string keys: name, value, unit. Example: [{"name":"WBC","value":"5.8","unit":"x10E3/uL"},{"name":"LDL Cholesterol","value":"127","unit":"mg/dL"}]. Skip tests with no numeric result. Return [] if nothing found.'
               }
             ]
           }],
@@ -65,21 +65,26 @@ export default async function handler(req, res) {
     }
 
     const raw = geminiData.candidates[0].content.parts[0].text;
-    console.log('[labs] raw Gemini text:', raw.slice(0, 400));
+    console.log('[labs] raw Gemini text:', raw.slice(0, 600));
 
-    // Extract the JSON array even if Gemini wraps it in extra text or markdown
-    const match = raw.match(/\[[\s\S]*\]/);
+    // Strip markdown fences first, then locate the JSON array
+    const stripped = raw
+      .replace(/```json/gi, '')
+      .replace(/```/g, '')
+      .trim();
+
+    const match = stripped.match(/\[[\s\S]*\]/);
     if (!match) {
-      console.error('[labs] no JSON array found in response');
-      return res.status(500).json({ error: 'Gemini did not return a JSON array' });
+      console.error('[labs] no JSON array found after stripping markdown. full text:', raw);
+      return res.status(500).json({ error: 'Gemini did not return a JSON array. Raw: ' + raw.slice(0, 300) });
     }
 
     let result;
     try {
       result = JSON.parse(match[0]);
     } catch (parseErr) {
-      console.error('[labs] JSON parse failed:', parseErr.message, '| text:', match[0].slice(0, 300));
-      return res.status(500).json({ error: 'Failed to parse Gemini response as JSON' });
+      console.error('[labs] JSON parse failed:', parseErr.message, '| extracted:', match[0].slice(0, 300));
+      return res.status(500).json({ error: 'JSON parse failed: ' + parseErr.message });
     }
 
     if (!Array.isArray(result)) {
