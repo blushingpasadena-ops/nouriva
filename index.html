@@ -901,8 +901,10 @@ const BIOMARKER_MAP={
 
 function handleLabUpload(input){
   const file=input.files[0];
+  console.log('[Labs] handleLabUpload — file:', file?.name, file?.type, file?.size);
   if(!file)return;
   if(file.size>10*1024*1024){toast('File too large. Max 10MB.');input.value='';return;}
+  console.log('[Labs] consent stored:', S.labConsent, '| required version:', LAB_CONSENT_VER);
   if(!S.labConsent||S.labConsent.version!==LAB_CONSENT_VER){_pendingLabFile=file;input.value='';showLabConsentModal();return;}
   processLabFile(file);input.value='';
 }
@@ -916,6 +918,7 @@ function confirmLabConsent(){
   if(_pendingLabFile){const f=_pendingLabFile;_pendingLabFile=null;processLabFile(f);}
 }
 async function processLabFile(file){
+  console.log('[Labs] processLabFile start —', file.name, file.type);
   if(!S.labs)S.labs=[];
   const ana=document.getElementById('labAna');
   ana.classList.add('on');
@@ -926,14 +929,26 @@ async function processLabFile(file){
     }else{
       b64=await toB64Lab(file);mime=file.type||'image/jpeg';
     }
+    console.log('[Labs] base64 ready — mime:', mime, '| length:', b64?.length);
     const resp=await fetch('/api/labs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageData:b64,mimeType:mime})});
-    if(!resp.ok)throw new Error('Extraction failed');
+    console.log('[Labs] API response — status:', resp.status, resp.ok);
+    if(!resp.ok){
+      const errText=await resp.text();
+      console.error('[Labs] API error body:', errText);
+      throw new Error('API returned '+resp.status+': '+errText);
+    }
     const data=await resp.json();
+    console.log('[Labs] parsed response:', data);
     ana.classList.remove('on');
     if(!data.biomarkers||data.biomarkers.length===0){toast('No biomarker values found in this document.');return;}
     _pendingBiomarkers=data.biomarkers.map(b=>({id:uid(),name:b.name||'',value:b.value||'',unit:b.unit||'',_removed:false}));
+    console.log('[Labs] biomarkers ready for review:', _pendingBiomarkers);
     showLabReviewModal();
-  }catch(e){ana.classList.remove('on');toast('Extraction failed — try a clearer image or PDF.');}
+  }catch(e){
+    console.error('[Labs] processLabFile failed:', e);
+    ana.classList.remove('on');
+    toast('Extraction failed — try a clearer image or PDF.');
+  }
 }
 function fileToB64Raw(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
 function toB64Lab(file){
@@ -949,9 +964,11 @@ function toB64Lab(file){
   });
 }
 function showLabReviewModal(){
+  console.log('[Labs] showLabReviewModal — biomarkers count:', _pendingBiomarkers?.length);
   if(!_pendingBiomarkers)return;
   document.getElementById('labReviewList').innerHTML=_pendingBiomarkers.map((b,i)=>`<div class="bio-edit-row" id="brow-${i}"><div class="bio-edit-name">${b.name}</div><input class="bio-edit-inp bio-edit-val" id="bval-${i}" value="${b.value}" type="text"/><input class="bio-edit-inp bio-edit-unit" id="bunit-${i}" value="${b.unit}" type="text"/><button class="bio-edit-del" onclick="removePendingBio(${i})">✕</button></div>`).join('');
   document.getElementById('labReviewModal').classList.add('on');
+  console.log('[Labs] review modal opened');
 }
 function removePendingBio(i){const row=document.getElementById('brow-'+i);if(row)row.style.display='none';if(_pendingBiomarkers[i])_pendingBiomarkers[i]._removed=true;}
 function saveLabValues(){
