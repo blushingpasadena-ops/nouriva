@@ -9,11 +9,10 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       console.error('[labs] GEMINI_API_KEY is not set');
-      return res.status(500).json({ error: 'GEMINI_API_KEY environment variable is not configured' });
+      return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on the server' });
     }
-    console.log('[labs] GEMINI_API_KEY present:', apiKey.slice(0, 6) + '…');
 
-    // req.body may be a pre-parsed object or a raw string depending on runtime
+    // req.body can be a pre-parsed object or a raw string depending on runtime
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const { imageData, mimeType } = body || {};
 
@@ -38,7 +37,7 @@ export default async function handler(req, res) {
                 }
               },
               {
-                text: 'You are a medical document parser. Extract ONLY the biomarker test results from this lab report. Return ONLY a JSON array where each item has exactly these three keys: "name" (biomarker name as a short readable string, e.g. "LDL Cholesterol"), "value" (the numeric result as a string, e.g. "127"), "unit" (unit of measurement as a string, e.g. "mg/dL"). Do NOT include: patient name, date of birth, provider name, clinic name, address, phone number, medical record number, accession number, or any personally identifying information. Do NOT include reference ranges, flags, abnormal indicators, or commentary. If a test has no numeric result, skip it. If no lab results are found, return an empty array []. Return raw JSON only — no markdown, no backticks, no explanation text.'
+                text: 'You are a medical document parser. Extract ALL biomarker test results from this lab report. Return ONLY a valid JSON array — no markdown, no backticks, no explanation, no extra text before or after. Each item must have exactly three keys: "name" (short readable string, e.g. "LDL Cholesterol"), "value" (numeric result as a string, e.g. "127"), "unit" (e.g. "mg/dL"). Skip any test with no numeric result. If no results found, return []. Example output: [{"name":"LDL Cholesterol","value":"127","unit":"mg/dL"},{"name":"HDL Cholesterol","value":"62","unit":"mg/dL"}]'
               }
             ]
           }],
@@ -54,30 +53,47 @@ export default async function handler(req, res) {
 
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
-      console.error('[labs] Gemini error body:', errText);
-      return res.status(500).json({ error: 'Gemini API error ' + geminiRes.status + ': ' + errText });
+      console.error('[labs] Gemini error:', errText);
+      return res.status(500).json({ error: `Gemini API error ${geminiRes.status}: ${errText}` });
     }
 
     const geminiData = await geminiRes.json();
 
-    if (!geminiData.candidates || !geminiData.candidates[0]) {
-      console.error('[labs] No candidates in response:', JSON.stringify(geminiData));
-      return res.status(500).json({ error: 'No response from Gemini' });
+    if (!geminiData.candidates?.[0]?.content?.parts?.[0]?.text) {
+      console.error('[labs] unexpected Gemini response shape:', JSON.stringify(geminiData).slice(0, 400));
+      return res.status(500).json({ error: 'No content in Gemini response' });
     }
 
-    const text = geminiData.candidates[0].content.parts[0].text;
-    console.log('[labs] raw Gemini text (first 300 chars):', text.slice(0, 300));
+    const raw = geminiData.candidates[0].content.parts[0].text;
+    console.log('[labs] raw Gemini text:', raw.slice(0, 400));
 
-    const clean = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    const result = JSON.parse(clean);
+    // Extract the JSON array even if Gemini wraps it in extra text or markdown
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) {
+      console.error('[labs] no JSON array found in response');
+      return res.status(500).json({ error: 'Gemini did not return a JSON array' });
+    }
+
+    let result;
+    try {
+      result = JSON.parse(match[0]);
+    } catch (parseErr) {
+      console.error('[labs] JSON parse failed:', parseErr.message, '| text:', match[0].slice(0, 300));
+      return res.status(500).json({ error: 'Failed to parse Gemini response as JSON' });
+    }
 
     if (!Array.isArray(result)) {
-      console.error('[labs] result is not an array:', typeof result, JSON.stringify(result).slice(0, 200));
+      console.error('[labs] result is not an array:', typeof result);
       return res.status(500).json({ error: 'Unexpected response format from Gemini' });
     }
 
-    console.log('[labs] extracted biomarkers count:', result.length);
-    return res.status(200).json({ biomarkers: result });
+    // Normalise — ensure every entry has name/value/unit strings
+    const biomarkers = result
+      .filter(b => b.name && b.value)
+      .map(b => ({ name: String(b.name), value: String(b.value), unit: String(b.unit || '') }));
+
+    console.log('[labs] biomarkers extracted:', biomarkers.length);
+    return res.status(200).json({ biomarkers });
 
   } catch (error) {
     console.error('[labs] unhandled error:', error.message, error.stack);
