@@ -3,8 +3,42 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Mivara™ — Your Health, Reclaimed</title>
+
+<!-- PWA manifest -->
+<link rel="manifest" href="/manifest.json"/>
+
+<!-- Theme & status bar -->
+<meta name="theme-color" content="#2d8653"/>
+<meta name="msapplication-TileColor" content="#2d8653"/>
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Mivara"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+
+<!-- Standard favicon -->
+<link rel="icon" type="image/svg+xml" href="/icon.svg"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"/>
+
+<!-- Open Graph -->
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Mivara — Your Health, Reclaimed"/>
+<meta property="og:description" content="Track meals with AI, monitor lab biomarkers, and build daily wellness habits — all in one private app."/>
+<meta property="og:image" content="/icon-512.png"/>
+<meta property="og:url" content="https://mivara-ai.vercel.app"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Mivara — Your Health, Reclaimed"/>
+<meta name="twitter:description" content="Track meals with AI, monitor lab biomarkers, and build daily wellness habits."/>
+<meta name="twitter:image" content="/icon-512.png"/>
+
+<!-- Description for search -->
+<meta name="description" content="Mivara is a personal wellness companion for meal tracking, lab biomarker insights, and daily habit building."/>
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -777,6 +811,17 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
     </div>
   </div>
 </div>
+<!-- iOS Add to Home Screen banner -->
+<div id="iosInstallBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9998;background:#2d8653;color:white;padding:14px 16px 28px;box-shadow:0 -2px 20px rgba(0,0,0,.18)">
+  <div style="display:flex;align-items:center;gap:12px;max-width:420px;margin:0 auto">
+    <img src="/apple-touch-icon.png" style="width:44px;height:44px;border-radius:10px;flex-shrink:0" alt=""/>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;font-size:14px;margin-bottom:2px;font-family:'Geist',sans-serif">Add Mivara to your Home Screen</div>
+      <div style="font-size:12px;opacity:.88;line-height:1.45;font-family:'Geist',sans-serif">Tap <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin:0 1px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share, then <strong>"Add to Home Screen"</strong> for the full app experience</div>
+    </div>
+    <button onclick="dismissIOSBanner()" style="background:rgba(255,255,255,.2);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif" aria-label="Dismiss">✕</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -805,7 +850,7 @@ const EXERCISES=[
 const EX_QUICK_HABITS={tennis:['🎾 Play tennis or hit a wall','🏃 30 min cardio warm-up','💪 Core + shoulder stability'],running:['🏃 Run 30+ min','💪 Strength cross-train 2x/wk','🧘 Post-run stretch 10 min'],cycling:['🚴 Cycle 45+ min','💪 Leg strength training','🏃 Active recovery walk'],swimming:['🏊 Swim 30+ min','💪 Dryland strength training','🧘 Mobility & flexibility'],yoga:['🧘 Yoga 30+ min','🏃 Light cardio 20 min','💪 Bodyweight strength 2x/wk'],weights:['🏋️ Lift weights 45+ min','🏃 Cardio 20 min 3x/wk','🧘 Stretch & recover'],walking:['🚶 Walk 30+ min','💪 Light resistance training','🧘 Evening wind-down walk'],golf:['⛳ Golf round or range','🏃 Walk instead of cart','💪 Rotational strength training'],hiit:['🥊 HIIT session 30 min','🏃 Active recovery walk','💪 Strength 2x/wk'],pilates:['🤸 Pilates 45 min','🏃 Cardio 20 min','🧘 Breathwork 10 min'],surf:['🏄 Surf session','💪 Paddle strength training','🧘 Balance & flexibility'],climbing:['🧗 Climb session','💪 Antagonist training','🤸 Finger tendon warm-up'],};
 function showLanding(){document.getElementById('landing').style.display='';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.remove('on')}
 function showAuth(t){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.remove('hidden');document.getElementById('mainApp').classList.remove('on');switchTab(t||'login')}
-function showApp(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('on');initApp();setTimeout(checkFeedbackSurveys,2500);}
+function showApp(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('on');initApp();setTimeout(checkFeedbackSurveys,2500);checkIOSInstallPrompt();}
 function switchTab(t){const fg=t==='forgot';document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('forgotForm').classList.toggle('hidden',!fg);document.querySelector('.auth-tabs').style.display=fg?'none':'';document.getElementById('authDivider').style.display=fg?'none':'';document.getElementById('authGuest').style.display=fg?'none':'';if(fg){document.getElementById('forgotEmailWrap').style.display='';document.getElementById('forgotBtn').style.display='';document.getElementById('aSuccess').classList.add('hidden');}document.getElementById('aErr').classList.add('hidden');}
 function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
 async function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const btn=document.querySelector('#loginForm .a-submit');btn.textContent='Signing in…';btn.disabled=true;const{data,error}=await sb.auth.signInWithPassword({email,password:pass});btn.textContent='Sign in →';btn.disabled=false;if(error)return showErr(error.message);const name=data.user.user_metadata?.name||email.split('@')[0];sbUserId=data.user.id;const{data:prof}=await sb.from('profiles').select('*').eq('id',sbUserId).single();applyProfile(prof,name,email);persist();showApp();toast('Welcome back, '+name.split(' ')[0]+'! 👋');}
@@ -1399,6 +1444,29 @@ function submitDay28(){
 }
 // ── End Pilot Feedback ───────────────────────────────────────────────────────
 window.onclick=function(e){if(!e.target.closest('#iconSel'))document.getElementById('iconPop')?.classList.remove('on');if(e.target===document.getElementById('stripeModal'))closeStripeModal();if(e.target===document.getElementById('labConsentModal'))cancelLabConsent();if(e.target===document.getElementById('labReviewModal'))cancelLabReview();};
+// ── iOS Install Banner ───────────────────────────────────────────────────────
+function checkIOSInstallPrompt(){
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  const isStandalone=window.navigator.standalone===true;
+  const dismissed=localStorage.getItem('mivara_ios_banner_v1');
+  if(isIOS&&!isStandalone&&!dismissed&&S.user?.email!=='guest@mivara.ai'){
+    setTimeout(()=>{document.getElementById('iosInstallBanner').style.display='block';},4000);
+  }
+}
+function dismissIOSBanner(){
+  document.getElementById('iosInstallBanner').style.display='none';
+  localStorage.setItem('mivara_ios_banner_v1','1');
+}
+// ── Service Worker ───────────────────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js').then(reg=>{
+      console.log('[SW] registered, scope:',reg.scope);
+    }).catch(err=>{
+      console.warn('[SW] registration failed:',err);
+    });
+  });
+}
 (async()=>{const hash=new URLSearchParams(window.location.hash.slice(1));if(hash.get('type')==='recovery'){showResetScreen();return;}const{data:{session}}=await sb.auth.getSession();if(session){sbUserId=session.user.id;const name=session.user.user_metadata?.name||session.user.email.split('@')[0];const{data:prof}=await sb.from('profiles').select('*').eq('id',sbUserId).single();applyProfile(prof,name,session.user.email);showApp();}else{showLanding();}})();
 </script>
 
