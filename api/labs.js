@@ -67,24 +67,27 @@ export default async function handler(req, res) {
     const raw = geminiData.candidates[0].content.parts[0].text;
     console.log('[labs] raw Gemini text:', raw.slice(0, 600));
 
-    // Strip markdown fences first, then locate the JSON array
+    // Strip markdown fences, then parse — try direct parse first, then regex extraction
     const stripped = raw
       .replace(/```json/gi, '')
       .replace(/```/g, '')
       .trim();
 
-    const match = stripped.match(/\[[\s\S]*\]/);
-    if (!match) {
-      console.error('[labs] no JSON array found after stripping markdown. full text:', raw);
-      return res.status(500).json({ error: 'Gemini did not return a JSON array. Raw: ' + raw.slice(0, 300) });
-    }
-
     let result;
     try {
-      result = JSON.parse(match[0]);
-    } catch (parseErr) {
-      console.error('[labs] JSON parse failed:', parseErr.message, '| extracted:', match[0].slice(0, 300));
-      return res.status(500).json({ error: 'JSON parse failed: ' + parseErr.message });
+      result = JSON.parse(stripped);
+    } catch (_) {
+      const match = stripped.match(/\[[\s\S]*\]/);
+      if (!match) {
+        console.error('[labs] no JSON array found after stripping markdown. full text:', raw);
+        return res.status(500).json({ error: 'Gemini did not return a JSON array. Raw: ' + raw.slice(0, 300) });
+      }
+      try {
+        result = JSON.parse(match[0]);
+      } catch (parseErr) {
+        console.error('[labs] JSON parse failed:', parseErr.message, '| extracted:', match[0].slice(0, 300));
+        return res.status(500).json({ error: 'JSON parse failed: ' + parseErr.message });
+      }
     }
 
     if (!Array.isArray(result)) {
