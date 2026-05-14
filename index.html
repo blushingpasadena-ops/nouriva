@@ -579,6 +579,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
       <div id="labSug" style="display:none"></div>
       <div class="lab-upload-zone" id="labZone"><input type="file" accept="image/*,.pdf" id="labFileInp" onchange="handleLabUpload(this)"/><div style="font-size:28px;margin-bottom:8px">🧪</div><div style="font-size:14px;font-weight:600;color:var(--sage);margin-bottom:4px">Upload Lab Results</div><div style="font-size:12px;color:var(--ink4)">JPG, PNG, or PDF · Max 10MB · AI extracts values only — no personal info stored</div></div>
       <div class="ana-bar-app" id="labAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">Extracting biomarkers…</span></div>
+      <div id="labErr" style="display:none;background:var(--rose2);color:var(--rose);font-size:13px;padding:12px 14px;border-radius:10px;margin-bottom:14px;border:1px solid #f0c0c0;line-height:1.6"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">
         <div class="sec-label" style="margin:0">Saved Biomarkers</div>
         <button id="deleteAllLabsBtn" onclick="confirmDeleteAllLabs()" style="display:none;padding:5px 11px;border-radius:8px;border:1.5px solid var(--rose);background:white;font-size:11px;font-weight:600;cursor:pointer;color:var(--rose);font-family:'Geist',sans-serif">🗑 Delete All</button>
@@ -903,7 +904,8 @@ function handleLabUpload(input){
   const file=input.files[0];
   console.log('[Labs] handleLabUpload — file:', file?.name, file?.type, file?.size);
   if(!file)return;
-  if(file.size>10*1024*1024){toast('File too large. Max 10MB.');input.value='';return;}
+  hideLabErr();
+  if(file.size>10*1024*1024){showLabErr('File too large — maximum size is 10MB.');input.value='';return;}
   console.log('[Labs] consent stored:', S.labConsent, '| required version:', LAB_CONSENT_VER);
   if(!S.labConsent||S.labConsent.version!==LAB_CONSENT_VER){_pendingLabFile=file;input.value='';showLabConsentModal();return;}
   processLabFile(file);input.value='';
@@ -917,8 +919,11 @@ function confirmLabConsent(){
   document.getElementById('labConsentModal').classList.remove('on');
   if(_pendingLabFile){const f=_pendingLabFile;_pendingLabFile=null;processLabFile(f);}
 }
+function showLabErr(msg){const el=document.getElementById('labErr');if(!el)return;el.textContent=msg;el.style.display='block';}
+function hideLabErr(){const el=document.getElementById('labErr');if(el)el.style.display='none';}
 async function processLabFile(file){
   console.log('[Labs] processLabFile start —', file.name, file.type);
+  hideLabErr();
   if(!S.labs)S.labs=[];
   const ana=document.getElementById('labAna');
   ana.classList.add('on');
@@ -930,24 +935,31 @@ async function processLabFile(file){
       b64=await toB64Lab(file);mime=file.type||'image/jpeg';
     }
     console.log('[Labs] base64 ready — mime:', mime, '| length:', b64?.length);
-    const resp=await fetch('/api/labs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageData:b64,mimeType:mime})});
+    let resp;
+    try{
+      resp=await fetch('/api/labs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageData:b64,mimeType:mime})});
+    }catch(netErr){
+      throw new Error('Network error — could not reach /api/labs. Is the app running via Vercel? ('+netErr.message+')');
+    }
     console.log('[Labs] API response — status:', resp.status, resp.ok);
     if(!resp.ok){
-      const errText=await resp.text();
-      console.error('[Labs] API error body:', errText);
-      throw new Error('API returned '+resp.status+': '+errText);
+      let errBody='';
+      try{const j=await resp.json();errBody=j.error||JSON.stringify(j);}catch{errBody=await resp.text().catch(()=>'');}
+      console.error('[Labs] API error body:', errBody);
+      if(resp.status===404)throw new Error('404 — /api/labs not found. The app must be served via Vercel (run: vercel dev), not a plain static server.');
+      throw new Error('Server error '+resp.status+': '+errBody);
     }
     const data=await resp.json();
     console.log('[Labs] parsed response:', data);
     ana.classList.remove('on');
-    if(!data.biomarkers||data.biomarkers.length===0){toast('No biomarker values found in this document.');return;}
+    if(!data.biomarkers||data.biomarkers.length===0){showLabErr('No biomarker values found in this document. Try a clearer photo or a different page of your lab report.');return;}
     _pendingBiomarkers=data.biomarkers.map(b=>({id:uid(),name:b.name||'',value:b.value||'',unit:b.unit||'',_removed:false}));
     console.log('[Labs] biomarkers ready for review:', _pendingBiomarkers);
     showLabReviewModal();
   }catch(e){
     console.error('[Labs] processLabFile failed:', e);
     ana.classList.remove('on');
-    toast('Extraction failed — try a clearer image or PDF.');
+    showLabErr('Upload failed: '+e.message);
   }
 }
 function fileToB64Raw(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
