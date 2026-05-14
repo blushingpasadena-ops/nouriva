@@ -4,14 +4,27 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { imageData, mimeType } = req.body;
+    console.log('[labs] handler invoked');
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error('[labs] GEMINI_API_KEY is not set');
+      return res.status(500).json({ error: 'GEMINI_API_KEY environment variable is not configured' });
+    }
+    console.log('[labs] GEMINI_API_KEY present:', apiKey.slice(0, 6) + '…');
+
+    // req.body may be a pre-parsed object or a raw string depending on runtime
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { imageData, mimeType } = body || {};
+
+    console.log('[labs] imageData length:', imageData?.length, '| mimeType:', mimeType);
 
     if (!imageData) {
       return res.status(400).json({ error: 'No image data received' });
     }
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,31 +50,37 @@ export default async function handler(req, res) {
       }
     );
 
+    console.log('[labs] Gemini response status:', geminiRes.status);
+
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
-      console.error('Gemini API error:', errText);
-      return res.status(500).json({ error: 'Gemini API error: ' + errText });
+      console.error('[labs] Gemini error body:', errText);
+      return res.status(500).json({ error: 'Gemini API error ' + geminiRes.status + ': ' + errText });
     }
 
     const geminiData = await geminiRes.json();
 
     if (!geminiData.candidates || !geminiData.candidates[0]) {
-      console.error('No candidates:', JSON.stringify(geminiData));
+      console.error('[labs] No candidates in response:', JSON.stringify(geminiData));
       return res.status(500).json({ error: 'No response from Gemini' });
     }
 
     const text = geminiData.candidates[0].content.parts[0].text;
+    console.log('[labs] raw Gemini text (first 300 chars):', text.slice(0, 300));
+
     const clean = text.replace(/```json/g, '').replace(/```/g, '').trim();
     const result = JSON.parse(clean);
 
     if (!Array.isArray(result)) {
-      return res.status(500).json({ error: 'Unexpected response format' });
+      console.error('[labs] result is not an array:', typeof result, JSON.stringify(result).slice(0, 200));
+      return res.status(500).json({ error: 'Unexpected response format from Gemini' });
     }
 
+    console.log('[labs] extracted biomarkers count:', result.length);
     return res.status(200).json({ biomarkers: result });
 
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('[labs] unhandled error:', error.message, error.stack);
     return res.status(500).json({ error: error.message });
   }
 }
