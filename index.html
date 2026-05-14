@@ -143,6 +143,9 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 .a-divider::before,.a-divider::after{content:’’;position:absolute;top:50%;width:38%;height:1px;background:var(–rule)}
 .a-divider::before{left:0}.a-divider::after{right:0}
 .a-err{background:var(–rose2);color:var(–rose);font-size:12px;padding:9px 13px;border-radius:8px;margin-bottom:14px;border:1px solid #f0c0c0}
+.a-ok{background:var(–sage4);color:var(–sage);font-size:13px;padding:12px 14px;border-radius:10px;margin-bottom:16px;line-height:1.6;border:1px solid var(–sage3)}
+.a-link{font-size:12px;color:var(–ink4);text-align:center;margin-top:14px}
+.a-link a{color:var(–ink4);text-decoration:none}.a-link a:hover{color:var(–sage)}
 
 .app{display:none;min-height:100vh}
 .app.on{display:flex;flex-direction:column}
@@ -440,7 +443,9 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
     <div id="aErr" class="a-err hidden"></div>
     <div id="loginForm">
       <div class="fld"><label>Email</label><input type="email" id="lEmail" placeholder="you@example.com"/></div>
-      <div class="fld"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="fld"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <p style="margin:6px 0 0;text-align:right"><a href="#" style="font-size:12px;color:var(--ink4);text-decoration:none" onmouseover="this.style.color='var(--sage)'" onmouseout="this.style.color='var(--ink4)'" onclick="switchTab('forgot');return false">Forgot password?</a></p>
+      </div>
       <button class="a-submit" onclick="doLogin()">Sign in →</button>
     </div>
     <div id="signupForm" class="hidden">
@@ -449,9 +454,27 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
       <div class="fld"><label>Password</label><input type="password" id="sPass" placeholder="At least 8 characters" onkeydown="if(event.key==='Enter')doSignup()"/></div>
       <button class="a-submit" onclick="doSignup()">Create account →</button>
     </div>
-    <div class="a-divider">or</div>
-    <button class="btn-o" style="width:100%;padding:11px;border-radius:10px;font-size:13px" onclick="doGuest()">Continue as guest (demo)</button>
-    <p style="font-size:12px;color:var(--ink4);text-align:center;margin-top:14px"><a href="#" style="color:var(--ink4)" onclick="showLanding();return false">← Back to home</a></p>
+    <div id="forgotForm" class="hidden">
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:18px;line-height:1.6">Enter your email and we'll send you a link to reset your password.</p>
+      <div id="aSuccess" class="a-ok hidden">✦ Reset link sent — check your inbox.</div>
+      <div class="fld" id="forgotEmailWrap"><label>Email</label><input type="email" id="fEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doForgotPassword()"/></div>
+      <button class="a-submit" id="forgotBtn" onclick="doForgotPassword()">Send reset link →</button>
+      <p class="a-link" style="margin-top:16px"><a href="#" onclick="switchTab('login');return false">← Back to sign in</a></p>
+    </div>
+    <div id="authDivider" class="a-divider">or</div>
+    <div id="authGuest"><button class="btn-o" style="width:100%;padding:11px;border-radius:10px;font-size:13px" onclick="doGuest()">Continue as guest (demo)</button></div>
+    <p class="a-link"><a href="#" onclick="showLanding();return false">← Back to home</a></p>
+  </div>
+</div>
+
+<div id="resetScreen" class="auth-screen hidden">
+  <div class="auth-box">
+    <div class="auth-logo">Miva<span>ra™</span></div>
+    <p class="auth-sub" style="margin-bottom:24px">Choose a new password for your account.</p>
+    <div id="rErr" class="a-err hidden"></div>
+    <div class="fld"><label>New password</label><input type="password" id="rPass" placeholder="At least 8 characters"/></div>
+    <div class="fld"><label>Confirm password</label><input type="password" id="rPass2" placeholder="Repeat your password" onkeydown="if(event.key==='Enter')doResetPassword()"/></div>
+    <button class="a-submit" id="resetBtn" onclick="doResetPassword()">Set new password →</button>
   </div>
 </div>
 
@@ -688,11 +711,14 @@ const EX_QUICK_HABITS={tennis:['🎾 Play tennis or hit a wall','🏃 30 min car
 function showLanding(){document.getElementById('landing').style.display='';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.remove('on')}
 function showAuth(t){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.remove('hidden');document.getElementById('mainApp').classList.remove('on');switchTab(t||'login')}
 function showApp(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('on');initApp()}
-function switchTab(t){document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('aErr').classList.add('hidden');}
+function switchTab(t){const fg=t==='forgot';document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('forgotForm').classList.toggle('hidden',!fg);document.querySelector('.auth-tabs').style.display=fg?'none':'';document.getElementById('authDivider').style.display=fg?'none':'';document.getElementById('authGuest').style.display=fg?'none':'';if(fg){document.getElementById('forgotEmailWrap').style.display='';document.getElementById('forgotBtn').style.display='';document.getElementById('aSuccess').classList.add('hidden');}document.getElementById('aErr').classList.add('hidden');}
 function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
 async function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const btn=document.querySelector('#loginForm .a-submit');btn.textContent='Signing in…';btn.disabled=true;const{data,error}=await sb.auth.signInWithPassword({email,password:pass});btn.textContent='Sign in →';btn.disabled=false;if(error)return showErr(error.message);const name=data.user.user_metadata?.name||email.split('@')[0];sbUserId=data.user.id;const{data:prof}=await sb.from('profiles').select('data').eq('id',sbUserId).single();S=prof?.data||ds();S.user={name,email};persist();showApp();toast('Welcome back, '+name.split(' ')[0]+'! 👋');}
 async function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const btn=document.querySelector('#signupForm .a-submit');btn.textContent='Creating…';btn.disabled=true;const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});btn.textContent='Create account →';btn.disabled=false;if(error)return showErr(error.message);if(!data.session){showErr('Check your email to confirm your account, then sign in.');switchTab('login');return;}sbUserId=data.user.id;S=ds();S.user={name,email};S.joinedDate=td();S.trialStart=td();S.habits=starterHabits();persist();showOnboarding();}
 function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@mivara.ai'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
+async function doForgotPassword(){const email=document.getElementById('fEmail').value.trim();if(!email)return showErr('Please enter your email address.');const btn=document.getElementById('forgotBtn');btn.textContent='Sending…';btn.disabled=true;const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href.split('#')[0]});btn.textContent='Send reset link →';btn.disabled=false;if(error)return showErr(error.message);document.getElementById('aSuccess').classList.remove('hidden');document.getElementById('forgotEmailWrap').style.display='none';btn.style.display='none';}
+function showResetScreen(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('resetScreen').classList.remove('hidden');document.getElementById('mainApp').classList.remove('on');}
+async function doResetPassword(){const pass=document.getElementById('rPass').value;const pass2=document.getElementById('rPass2').value;const rErr=m=>{const e=document.getElementById('rErr');e.textContent=m;e.classList.remove('hidden');};if(!pass||!pass2)return rErr('Please fill in both fields.');if(pass.length<8)return rErr('Password must be at least 8 characters.');if(pass!==pass2)return rErr('Passwords don\'t match.');const btn=document.getElementById('resetBtn');btn.textContent='Saving…';btn.disabled=true;const{error}=await sb.auth.updateUser({password:pass});btn.textContent='Set new password →';btn.disabled=false;if(error)return rErr(error.message);document.getElementById('resetScreen').classList.add('hidden');showAuth('login');toast('Password updated — sign in with your new password.');}
 async function doSignOut(){persist();await sb.auth.signOut();sbUserId=null;S=ds();showLanding();toast('Signed out.');}
 function persist(){ss(S);if(sbUserId&&S.user?.email!=='guest@mivara.ai'){sb.from('profiles').upsert({id:sbUserId,name:S.user?.name||'',data:S,updated_at:new Date().toISOString()}).then();}}
 function starterHabits(){return[{id:uid(),name:'Morning iron supplement + vitamin C',icon:'💊',created:td()},{id:uid(),name:'Eat fatty fish or take omega-3',icon:'🐟',created:td()},{id:uid(),name:'Barley-rice blend at dinner',icon:'🌿',created:td()},{id:uid(),name:'Magnesium glycinate before bed',icon:'🌙',created:td()},];}
@@ -1007,7 +1033,7 @@ function downloadMyData(){
 function goPrivacy(){const btns=[...document.querySelectorAll('.ni')];const pb=btns.find(el=>el.textContent.includes('Profile'));goTab('profile',pb);}
 // ── End Labs ──────────────────────────────────────────────────────────────
 window.onclick=function(e){if(!e.target.closest('#iconSel'))document.getElementById('iconPop')?.classList.remove('on');if(e.target===document.getElementById('stripeModal'))closeStripeModal();if(e.target===document.getElementById('labConsentModal'))cancelLabConsent();if(e.target===document.getElementById('labReviewModal'))cancelLabReview();};
-(async()=>{const{data:{session}}=await sb.auth.getSession();if(session){sbUserId=session.user.id;const name=session.user.user_metadata?.name||session.user.email.split('@')[0];const{data:prof}=await sb.from('profiles').select('data').eq('id',sbUserId).single();S=prof?.data||ds();S.user={name,email:session.user.email};showApp();}else{showLanding();}})();
+(async()=>{const hash=new URLSearchParams(window.location.hash.slice(1));if(hash.get('type')==='recovery'){showResetScreen();return;}const{data:{session}}=await sb.auth.getSession();if(session){sbUserId=session.user.id;const name=session.user.user_metadata?.name||session.user.email.split('@')[0];const{data:prof}=await sb.from('profiles').select('data').eq('id',sbUserId).single();S=prof?.data||ds();S.user={name,email:session.user.email};showApp();}else{showLanding();}})();
 </script>
 
 </body>
