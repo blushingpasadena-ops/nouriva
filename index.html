@@ -968,7 +968,14 @@ function saveLabValues(){
     const existIdx=S.labs.findIndex(l=>l.biomarker_name.toLowerCase()===b.name.toLowerCase());
     const entry={id:existIdx>=0?S.labs[existIdx].id:uid(),biomarker_name:b.name,biomarker_value:value,biomarker_unit:unit,date_entered:td(),source:'lab_upload'};
     if(existIdx>=0)S.labs[existIdx]=entry;else S.labs.push(entry);
-    if(sbUserId)sb.from('biomarkers').upsert({id:entry.id,user_id:sbUserId,lab_id:null,marker_name:entry.biomarker_name,marker_value:entry.biomarker_value,unit:entry.biomarker_unit}).then();
+    if(sbUserId){
+      const row={user_id:sbUserId,marker_name:entry.biomarker_name,marker_value:entry.biomarker_value,unit:entry.biomarker_unit};
+      if(existIdx>=0){
+        sb.from('biomarkers').update({marker_value:entry.biomarker_value,unit:entry.biomarker_unit}).eq('user_id',sbUserId).eq('marker_name',entry.biomarker_name).then(({error})=>{if(error)console.error('biomarker update failed:',error);});
+      }else{
+        sb.from('biomarkers').insert(row).then(({error})=>{if(error)console.error('biomarker insert failed:',error);});
+      }
+    }
     saved++;
   });
   persist();
