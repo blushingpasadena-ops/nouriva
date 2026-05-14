@@ -880,7 +880,7 @@ function generatePDF(from,to){
     chk(10);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(...sage);doc.text('HABITS',ML,y);y+=5;
     if(!S.habits.length){doc.setFont('helvetica','italic');doc.setFontSize(9);doc.setTextColor(...ink4);doc.text('No habits tracked.',ML+3,y);y+=7;}
     else{S.habits.forEach(h=>{chk(7);const dn=done.includes(h.id);doc.setFillColor(dn?sage[0]:255,dn?sage[1]:255,dn?sage[2]:255);doc.setDrawColor(dn?sage[0]:180,dn?sage[1]:180,dn?sage[2]:180);doc.roundedRect(ML,y-3,4,4,0.5,0.5,'FD');if(dn){doc.setFont('helvetica','bold');doc.setFontSize(5);doc.setTextColor(255,255,255);doc.text('v',ML+1,y+0.5);}doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(dn?sage[0]:ink[0],dn?sage[1]:ink[1],dn?sage[2]:ink[2]);doc.text(strip(h.name)||'Habit',ML+6,y);y+=6;});y+=2;}
-    chk(32);doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...ink3);doc.text('Notes for my provider:',ML,y);y+=5;
+    chk(32);doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...ink3);doc.text('Notes:',ML,y);y+=5;
     doc.setDrawColor(...rule);doc.setLineWidth(0.3);for(let i=0;i<3;i++){doc.line(ML,y+i*8,W-MR,y+i*8);}y+=32;
   });
   if(S.labValues&&Object.keys(S.labValues).length){np();doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...sage);doc.text('Lab Values Snapshot',ML,y);y+=10;Object.entries(S.labValues).forEach(([k,v])=>{chk(7);doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(...ink);doc.text(k+': '+v,ML,y);y+=7;});}
