@@ -37,7 +37,7 @@ export default async function handler(req, res) {
                 }
               },
               {
-                text: 'Extract all biomarker results from this lab report. Respond with a raw JSON array only. Do not use markdown. Do not use code blocks. Do not wrap in backticks. Do not add any text before or after the array. Start your response with [ and end with ]. Each element must have exactly three string keys: name, value, unit. Example: [{"name":"WBC","value":"5.8","unit":"x10E3/uL"},{"name":"LDL Cholesterol","value":"127","unit":"mg/dL"}]. Skip tests with no numeric result. Return [] if nothing found.'
+                text: 'Extract all biomarker results from this lab report. Respond with a raw JSON object only. Do not use markdown. Do not use code blocks. Do not wrap in backticks. Do not add any text before or after the object. Start your response with { and end with }.\n\nThe object must have exactly two keys:\n1. "collection_date": the date the sample was collected, in YYYY-MM-DD format. If not visible, use null.\n2. "biomarkers": an array of objects each with exactly three string keys: name, value, unit.\n\nExample: {"collection_date":"2025-04-15","biomarkers":[{"name":"WBC","value":"5.8","unit":"x10E3/uL"},{"name":"LDL Cholesterol","value":"127","unit":"mg/dL"}]}\n\nSkip tests with no numeric result. Return {"collection_date":null,"biomarkers":[]} if nothing found.'
               }
             ]
           }],
@@ -73,35 +73,46 @@ export default async function handler(req, res) {
       .replace(/```/g, '')
       .trim();
 
-    let result;
+    let parsed;
     try {
-      result = JSON.parse(stripped);
+      parsed = JSON.parse(stripped);
     } catch (_) {
-      const match = stripped.match(/\[[\s\S]*\]/);
-      if (!match) {
-        console.error('[labs] no JSON array found after stripping markdown. full text:', raw);
-        return res.status(500).json({ error: 'Gemini did not return a JSON array. Raw: ' + raw.slice(0, 300) });
+      // Try extracting the outermost object, then array as fallback
+      const objMatch = stripped.match(/\{[\s\S]*\}/);
+      const arrMatch = stripped.match(/\[[\s\S]*\]/);
+      const candidate = objMatch ? objMatch[0] : arrMatch ? arrMatch[0] : null;
+      if (!candidate) {
+        console.error('[labs] no JSON found after stripping markdown. full text:', raw);
+        return res.status(500).json({ error: 'Gemini did not return valid JSON. Raw: ' + raw.slice(0, 300) });
       }
       try {
-        result = JSON.parse(match[0]);
+        parsed = JSON.parse(candidate);
       } catch (parseErr) {
-        console.error('[labs] JSON parse failed:', parseErr.message, '| extracted:', match[0].slice(0, 300));
+        console.error('[labs] JSON parse failed:', parseErr.message, '| candidate:', candidate.slice(0, 300));
         return res.status(500).json({ error: 'JSON parse failed: ' + parseErr.message });
       }
     }
 
-    if (!Array.isArray(result)) {
-      console.error('[labs] result is not an array:', typeof result);
+    // Accept new object format { collection_date, biomarkers } or legacy array format
+    let rawBiomarkers, collection_date;
+    if (Array.isArray(parsed)) {
+      rawBiomarkers = parsed;
+      collection_date = null;
+    } else if (parsed && typeof parsed === 'object') {
+      rawBiomarkers = Array.isArray(parsed.biomarkers) ? parsed.biomarkers : [];
+      collection_date = typeof parsed.collection_date === 'string' ? parsed.collection_date : null;
+    } else {
+      console.error('[labs] unexpected parsed type:', typeof parsed);
       return res.status(500).json({ error: 'Unexpected response format from Gemini' });
     }
 
     // Normalise — ensure every entry has name/value/unit strings
-    const biomarkers = result
+    const biomarkers = rawBiomarkers
       .filter(b => b.name && b.value)
       .map(b => ({ name: String(b.name), value: String(b.value), unit: String(b.unit || '') }));
 
-    console.log('[labs] biomarkers extracted:', biomarkers.length);
-    return res.status(200).json({ biomarkers });
+    console.log('[labs] biomarkers extracted:', biomarkers.length, '| collection_date:', collection_date);
+    return res.status(200).json({ biomarkers, collection_date });
 
   } catch (error) {
     console.error('[labs] unhandled error:', error.message, error.stack);

@@ -304,7 +304,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 .bio-list{display:flex;flex-direction:column;gap:10px}
 .bio-row{background:white;border:1px solid var(--rule);border-radius:11px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
 .bio-name{flex:1;font-size:13px;font-weight:600;color:var(--ink)}
-.bio-val{font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1;color:var(--sage)}
+.bio-val{font-family:'Geist',sans-serif;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;color:var(--sage)}
 .bio-unit{font-size:11px;color:var(--ink4);margin-left:2px}
 .bio-date{font-size:11px;color:var(--ink4);white-space:nowrap}
 .bio-del{width:26px;height:26px;border-radius:7px;border:none;background:var(--rose2);color:var(--rose);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
@@ -815,6 +815,11 @@ async function doForgotPassword(){const email=document.getElementById('fEmail').
 function showResetScreen(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('resetScreen').classList.remove('hidden');document.getElementById('mainApp').classList.remove('on');}
 async function doResetPassword(){const pass=document.getElementById('rPass').value;const pass2=document.getElementById('rPass2').value;const rErr=m=>{const e=document.getElementById('rErr');e.textContent=m;e.classList.remove('hidden');};if(!pass||!pass2)return rErr('Please fill in both fields.');if(pass.length<8)return rErr('Password must be at least 8 characters.');if(pass!==pass2)return rErr('Passwords don\'t match.');const btn=document.getElementById('resetBtn');btn.textContent='Saving…';btn.disabled=true;const{error}=await sb.auth.updateUser({password:pass});btn.textContent='Set new password →';btn.disabled=false;if(error)return rErr(error.message);document.getElementById('resetScreen').classList.add('hidden');showAuth('login');toast('Password updated — sign in with your new password.');}
 async function doSignOut(){persist();await sb.auth.signOut();sbUserId=null;S=ds();showLanding();toast('Signed out.');}
+// Sanitize values before sending to Supabase jsonb columns — guards against
+// undefined, corrupted strings, or non-serializable values from localStorage.
+function jArr(v){if(Array.isArray(v))return v;if(typeof v==='string'){try{const p=JSON.parse(v);if(Array.isArray(p))return p;}catch{}}return[];}
+function jObj(v){if(v&&typeof v==='object'&&!Array.isArray(v))return v;if(typeof v==='string'){try{const p=JSON.parse(v);if(p&&typeof p==='object'&&!Array.isArray(p))return p;}catch{}}return{};}
+function jVal(v){if(v===undefined)return null;try{JSON.stringify(v);return v;}catch{return null;}}
 function persist(){
   ss(S);
   if(sbUserId&&S.user?.email!=='guest@mivara.ai'){
@@ -824,17 +829,17 @@ function persist(){
       full_name:S.user.name,
       is_paid:S.subscribed?true:false,
       exercise:S.exercise||null,
-      food_background:S.foodBackground||[],
+      food_background:jArr(S.foodBackground),
       cycle_sync:S.cycleSync?true:false,
       cycle_start_date:S.cycleStartDate||null,
       cycle_life_stage:S.cycleLifeStage||null,
       trial_start:S.trialStart||null,
-      lab_consent:S.labConsent||null,
-      habits:S.habits||[],
-      completions:S.completions||{},
-      meals:S.meals||[],
-      labs:S.labs||[],
-      feedback_shown:S.feedbackShown||[]
+      lab_consent:jVal(S.labConsent),
+      habits:jArr(S.habits),
+      completions:jObj(S.completions),
+      meals:jArr(S.meals),
+      labs:jArr(S.labs),
+      feedback_shown:jArr(S.feedbackShown)
     };
     sb.from('profiles').upsert(row).then(({error})=>{
       if(error)console.error('[persist] profiles upsert failed:',error.code,error.message,error.details);
@@ -992,7 +997,7 @@ function toB64(f){
 function dataUrl(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});}
 // ── Labs ──────────────────────────────────────────────────────────────────
 const LAB_CONSENT_VER='1.0';
-let _pendingLabFile=null,_pendingBiomarkers=null;
+let _pendingLabFile=null,_pendingBiomarkers=null,_pendingCollectionDate=null;
 
 const BIOMARKER_RANGES={
   'wbc':{low:4.5,high:11.0,borderLow:3.5,borderHigh:13.0},
@@ -1215,8 +1220,9 @@ async function processLabFile(file){
     console.log('[Labs] parsed response:', data);
     ana.classList.remove('on');
     if(!data.biomarkers||data.biomarkers.length===0){showLabErr('No biomarker values found in this document. Try a clearer photo or a different page of your lab report.');return;}
+    _pendingCollectionDate=data.collection_date||null;
     _pendingBiomarkers=data.biomarkers.map(b=>({id:uid(),name:b.name||'',value:b.value||'',unit:b.unit||'',_removed:false}));
-    console.log('[Labs] biomarkers ready for review:', _pendingBiomarkers);
+    console.log('[Labs] biomarkers ready for review:', _pendingBiomarkers, '| collection_date:', _pendingCollectionDate);
     showLabReviewModal();
   }catch(e){
     console.error('[Labs] processLabFile failed:', e);
@@ -1240,7 +1246,7 @@ function toB64Lab(file){
 function showLabReviewModal(){
   console.log('[Labs] showLabReviewModal — biomarkers count:', _pendingBiomarkers?.length);
   if(!_pendingBiomarkers)return;
-  document.getElementById('labWorkDate').value=td();
+  document.getElementById('labWorkDate').value=_pendingCollectionDate||td();
   document.getElementById('labReviewList').innerHTML=_pendingBiomarkers.map((b,i)=>`<div class="bio-edit-row" id="brow-${i}"><div class="bio-edit-name">${b.name}</div><input class="bio-edit-inp bio-edit-val" id="bval-${i}" value="${b.value}" type="text"/><input class="bio-edit-inp bio-edit-unit" id="bunit-${i}" value="${b.unit}" type="text"/><button class="bio-edit-del" onclick="removePendingBio(${i})">✕</button></div>`).join('');
   document.getElementById('labReviewModal').classList.add('on');
   console.log('[Labs] review modal opened');
@@ -1273,11 +1279,11 @@ function saveLabValues(){
   });
   persist();
   document.getElementById('labReviewModal').classList.remove('on');
-  _pendingBiomarkers=null;
+  _pendingBiomarkers=null;_pendingCollectionDate=null;
   renderBioList();renderLabSug();
   toast(saved+' biomarker'+(saved!==1?'s':'')+' saved ✦');
 }
-function cancelLabReview(){document.getElementById('labReviewModal').classList.remove('on');_pendingBiomarkers=null;}
+function cancelLabReview(){document.getElementById('labReviewModal').classList.remove('on');_pendingBiomarkers=null;_pendingCollectionDate=null;}
 function renderBioList(){
   if(!S.labs)S.labs=[];
   const list=document.getElementById('bioList');
