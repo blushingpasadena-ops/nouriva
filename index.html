@@ -699,6 +699,84 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
     </div>
   </div>
 </div>
+<!-- Survey: Day 3 -->
+<div class="modal-bg" id="surveyDay3Modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title">How's Mivara feeling so far?</div>
+    <div class="modal-body" style="padding-bottom:0">
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:18px">You're 3 days in — we'd love your first impression. Takes 30 seconds.</p>
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Overall feel so far</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:32px;cursor:pointer">
+          <span id="star1" onclick="setRating(1)" style="color:#9ca3af;transition:.1s">☆</span>
+          <span id="star2" onclick="setRating(2)" style="color:#9ca3af;transition:.1s">☆</span>
+          <span id="star3" onclick="setRating(3)" style="color:#9ca3af;transition:.1s">☆</span>
+          <span id="star4" onclick="setRating(4)" style="color:#9ca3af;transition:.1s">☆</span>
+          <span id="star5" onclick="setRating(5)" style="color:#9ca3af;transition:.1s">☆</span>
+        </div>
+      </div>
+      <div class="fld">
+        <label>Anything you'd like us to know? <span style="color:var(--ink4);font-weight:400">(optional)</span></label>
+        <textarea id="day3Text" rows="3" placeholder="First impressions, what's working, what's not…" style="width:100%;padding:10px 12px;border:1.5px solid var(--rule);border-radius:9px;font-size:13px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none;resize:vertical;box-sizing:border-box;line-height:1.5"></textarea>
+      </div>
+    </div>
+    <div class="modal-acts">
+      <button class="modal-ok" onclick="submitDay3()">Share feedback →</button>
+      <button class="modal-no" onclick="dismissSurvey('day3')">Skip for now</button>
+    </div>
+  </div>
+</div>
+<!-- Survey: Day 10 -->
+<div class="modal-bg" id="surveyDay10Modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title">Which features do you use most?</div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:16px">Helps us understand what matters most to you. Select all that apply.</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <label style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink);cursor:pointer"><input type="checkbox" id="fb10_meal" style="accent-color:var(--sage);width:16px;height:16px;cursor:pointer"/> 🍽 Meal photo logging</label>
+        <label style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink);cursor:pointer"><input type="checkbox" id="fb10_lab" style="accent-color:var(--sage);width:16px;height:16px;cursor:pointer"/> 🧪 Lab tracker</label>
+        <label style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink);cursor:pointer"><input type="checkbox" id="fb10_habit" style="accent-color:var(--sage);width:16px;height:16px;cursor:pointer"/> 🌿 Habit tracking</label>
+        <label style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink);cursor:pointer"><input type="checkbox" id="fb10_exercise" style="accent-color:var(--sage);width:16px;height:16px;cursor:pointer"/> 🏃 Exercise suggestions</label>
+      </div>
+    </div>
+    <div class="modal-acts">
+      <button class="modal-ok" onclick="submitDay10()">Submit →</button>
+      <button class="modal-no" onclick="dismissSurvey('day10')">Skip for now</button>
+    </div>
+  </div>
+</div>
+<!-- Survey: Day 20 -->
+<div class="modal-bg" id="surveyDay20Modal">
+  <div class="modal" style="max-width:380px;text-align:center">
+    <div class="modal-title">Would you continue with Mivara after your trial?</div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:18px">You're 20 days in — be honest, we can take it.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button onclick="submitDay20('yes')" style="width:100%;padding:13px 16px;border-radius:10px;border:none;background:#2d8653;color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif">Yes, absolutely →</button>
+        <button onclick="submitDay20('maybe')" style="width:100%;padding:13px 16px;border-radius:10px;border:1.5px solid var(--rule);background:white;color:var(--ink);font-size:14px;font-weight:600;cursor:pointer;font-family:'Geist',sans-serif">Maybe — depends on what's added</button>
+        <button onclick="submitDay20('no')" style="width:100%;padding:13px 16px;border-radius:10px;border:1.5px solid var(--rule);background:white;color:var(--ink3);font-size:14px;font-weight:500;cursor:pointer;font-family:'Geist',sans-serif">Not right now</button>
+      </div>
+    </div>
+    <div style="padding:0 24px 20px;text-align:center"><button class="modal-no" onclick="dismissSurvey('day20')" style="background:none;border:none;font-size:12px;color:var(--ink4);cursor:pointer">Skip</button></div>
+  </div>
+</div>
+<!-- Survey: Day 28 -->
+<div class="modal-bg" id="surveyDay28Modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title">What would make Mivara a must-have?</div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:16px">You've nearly completed your trial. Your feedback shapes what we build next — we read every response.</p>
+      <div class="fld">
+        <label>What would make you a definite subscriber? <span style="color:var(--ink4);font-weight:400">(open-ended)</span></label>
+        <textarea id="day28Text" rows="4" placeholder="A feature, a fix, a feeling — whatever comes to mind…" style="width:100%;padding:10px 12px;border:1.5px solid var(--rule);border-radius:9px;font-size:13px;font-family:'Geist',sans-serif;color:var(--ink);background:var(--cream);outline:none;resize:vertical;box-sizing:border-box;line-height:1.5"></textarea>
+      </div>
+    </div>
+    <div class="modal-acts">
+      <button class="modal-ok" onclick="submitDay28()">Send feedback →</button>
+      <button class="modal-no" onclick="dismissSurvey('day28')">Skip for now</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -707,7 +785,7 @@ const sb=supabase.createClient('https://cwzdybtfkqflqphpenku.supabase.co','sb_pu
 let sbUserId=null;
 function gs(){try{return JSON.parse(localStorage.getItem(SK))||ds()}catch{return ds()}}
 function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
-function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null,foodBackground:[],otherFoodBackground:'',cycleSync:false,cycleStartDate:'',cycleLifeStage:'',trialStart:null,labs:[],labConsent:null}}
+function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null,foodBackground:[],otherFoodBackground:'',cycleSync:false,cycleStartDate:'',cycleLifeStage:'',trialStart:null,labs:[],labConsent:null,feedbackShown:[]}}
 let S=gs();let pChrt=null,sChrt=null;
 const ICONS=['🌿','🏃','💊','🐟','🥗','🧘','💪','🍵','📚','🌙','☀️','🥦','🧴','💧','🧠','❤️','🏋️','🎯','✨','🫁','🩸','🧬','🏊','🚴','⛳','🎾','🥊','🏄','🧗'];
 const EXERCISES=[
@@ -727,7 +805,7 @@ const EXERCISES=[
 const EX_QUICK_HABITS={tennis:['🎾 Play tennis or hit a wall','🏃 30 min cardio warm-up','💪 Core + shoulder stability'],running:['🏃 Run 30+ min','💪 Strength cross-train 2x/wk','🧘 Post-run stretch 10 min'],cycling:['🚴 Cycle 45+ min','💪 Leg strength training','🏃 Active recovery walk'],swimming:['🏊 Swim 30+ min','💪 Dryland strength training','🧘 Mobility & flexibility'],yoga:['🧘 Yoga 30+ min','🏃 Light cardio 20 min','💪 Bodyweight strength 2x/wk'],weights:['🏋️ Lift weights 45+ min','🏃 Cardio 20 min 3x/wk','🧘 Stretch & recover'],walking:['🚶 Walk 30+ min','💪 Light resistance training','🧘 Evening wind-down walk'],golf:['⛳ Golf round or range','🏃 Walk instead of cart','💪 Rotational strength training'],hiit:['🥊 HIIT session 30 min','🏃 Active recovery walk','💪 Strength 2x/wk'],pilates:['🤸 Pilates 45 min','🏃 Cardio 20 min','🧘 Breathwork 10 min'],surf:['🏄 Surf session','💪 Paddle strength training','🧘 Balance & flexibility'],climbing:['🧗 Climb session','💪 Antagonist training','🤸 Finger tendon warm-up'],};
 function showLanding(){document.getElementById('landing').style.display='';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.remove('on')}
 function showAuth(t){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.remove('hidden');document.getElementById('mainApp').classList.remove('on');switchTab(t||'login')}
-function showApp(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('on');initApp()}
+function showApp(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('on');initApp();setTimeout(checkFeedbackSurveys,2500);}
 function switchTab(t){const fg=t==='forgot';document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('forgotForm').classList.toggle('hidden',!fg);document.querySelector('.auth-tabs').style.display=fg?'none':'';document.getElementById('authDivider').style.display=fg?'none':'';document.getElementById('authGuest').style.display=fg?'none':'';if(fg){document.getElementById('forgotEmailWrap').style.display='';document.getElementById('forgotBtn').style.display='';document.getElementById('aSuccess').classList.add('hidden');}document.getElementById('aErr').classList.add('hidden');}
 function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
 async function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const btn=document.querySelector('#loginForm .a-submit');btn.textContent='Signing in…';btn.disabled=true;const{data,error}=await sb.auth.signInWithPassword({email,password:pass});btn.textContent='Sign in →';btn.disabled=false;if(error)return showErr(error.message);const name=data.user.user_metadata?.name||email.split('@')[0];sbUserId=data.user.id;const{data:prof}=await sb.from('profiles').select('*').eq('id',sbUserId).single();applyProfile(prof,name,email);persist();showApp();toast('Welcome back, '+name.split(' ')[0]+'! 👋');}
@@ -755,14 +833,15 @@ function persist(){
       habits:S.habits||[],
       completions:S.completions||{},
       meals:S.meals||[],
-      labs:S.labs||[]
+      labs:S.labs||[],
+      feedback_shown:S.feedbackShown||[]
     };
     sb.from('profiles').upsert(row).then(({error})=>{
       if(error)console.error('[persist] profiles upsert failed:',error.code,error.message,error.details);
     });
   }
 }
-function applyProfile(prof,name,email){S=ds();S.user={name:prof?.full_name||name,email};S.subscribed=prof?.is_paid||false;S.habits=prof?.habits||[];S.completions=prof?.completions||{};S.meals=prof?.meals||[];S.exercise=prof?.exercise||null;S.foodBackground=prof?.food_background||[];S.cycleSync=prof?.cycle_sync||false;S.cycleStartDate=prof?.cycle_start_date||'';S.cycleLifeStage=prof?.cycle_life_stage||'';S.trialStart=prof?.trial_start||null;S.labs=prof?.labs||[];S.labConsent=prof?.lab_consent||null;}
+function applyProfile(prof,name,email){S=ds();S.user={name:prof?.full_name||name,email};S.subscribed=prof?.is_paid||false;S.habits=prof?.habits||[];S.completions=prof?.completions||{};S.meals=prof?.meals||[];S.exercise=prof?.exercise||null;S.foodBackground=prof?.food_background||[];S.cycleSync=prof?.cycle_sync||false;S.cycleStartDate=prof?.cycle_start_date||'';S.cycleLifeStage=prof?.cycle_life_stage||'';S.trialStart=prof?.trial_start||null;S.labs=prof?.labs||[];S.labConsent=prof?.lab_consent||null;S.feedbackShown=prof?.feedback_shown||[];}
 function starterHabits(){return[{id:uid(),name:'Morning iron supplement + vitamin C',icon:'💊',created:td()},{id:uid(),name:'Eat fatty fish or take omega-3',icon:'🐟',created:td()},{id:uid(),name:'Barley-rice blend at dinner',icon:'🌿',created:td()},{id:uid(),name:'Magnesium glycinate before bed',icon:'🌙',created:td()},];}
 function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('habits',document.querySelector('.ni'));}
 function updateSubUI(){
@@ -1264,6 +1343,55 @@ function downloadMyData(){
 }
 function goPrivacy(){const btns=[...document.querySelectorAll('.ni')];const pb=btns.find(el=>el.textContent.includes('Profile'));goTab('profile',pb);}
 // ── End Labs ──────────────────────────────────────────────────────────────
+// ── Pilot Feedback ──────────────────────────────────────────────────────────
+let _surveyRating=0;
+const SURVEYS={day3:'surveyDay3Modal',day10:'surveyDay10Modal',day20:'surveyDay20Modal',day28:'surveyDay28Modal'};
+function checkFeedbackSurveys(){
+  if(!S.trialStart||!sbUserId||S.user?.email==='guest@mivara.ai')return;
+  const days=Math.floor((Date.now()-new Date(S.trialStart+'T00:00:00').getTime())/86400000);
+  const shown=S.feedbackShown||[];
+  if(days>=3&&!shown.includes('day3')){openSurvey('day3');return;}
+  if(days>=10&&!shown.includes('day10')){openSurvey('day10');return;}
+  if(days>=20&&!shown.includes('day20')){openSurvey('day20');return;}
+  if(days>=28&&!shown.includes('day28')){openSurvey('day28');return;}
+}
+function openSurvey(id){document.getElementById(SURVEYS[id])?.classList.add('on');}
+function closeSurveyModal(id){document.getElementById(SURVEYS[id])?.classList.remove('on');}
+function markSurveyShown(id){if(!S.feedbackShown)S.feedbackShown=[];if(!S.feedbackShown.includes(id))S.feedbackShown.push(id);persist();}
+function dismissSurvey(id){markSurveyShown(id);closeSurveyModal(id);}
+async function submitFeedback(id,response){
+  markSurveyShown(id);
+  closeSurveyModal(id);
+  if(sbUserId){
+    sb.from('feedback').insert({user_id:sbUserId,survey_id:id,response}).then(({error})=>{
+      if(error)console.error('[feedback] insert failed:',error.code,error.message);
+    });
+  }
+  toast('Thanks for your feedback 🌿');
+}
+function setRating(n){
+  _surveyRating=n;
+  for(let i=1;i<=5;i++){
+    const el=document.getElementById('star'+i);
+    if(el){el.textContent=i<=n?'★':'☆';el.style.color=i<=n?'#f59e0b':'#9ca3af';}
+  }
+}
+function submitDay3(){
+  const text=document.getElementById('day3Text')?.value.trim()||'';
+  submitFeedback('day3',{rating:_surveyRating||null,text});
+  _surveyRating=0;
+}
+function submitDay10(){
+  const features=[];
+  ['meal','lab','habit','exercise'].forEach(k=>{if(document.getElementById('fb10_'+k)?.checked)features.push(k);});
+  submitFeedback('day10',{features});
+}
+function submitDay20(answer){submitFeedback('day20',{answer});}
+function submitDay28(){
+  const text=document.getElementById('day28Text')?.value.trim()||'';
+  submitFeedback('day28',{text});
+}
+// ── End Pilot Feedback ───────────────────────────────────────────────────────
 window.onclick=function(e){if(!e.target.closest('#iconSel'))document.getElementById('iconPop')?.classList.remove('on');if(e.target===document.getElementById('stripeModal'))closeStripeModal();if(e.target===document.getElementById('labConsentModal'))cancelLabConsent();if(e.target===document.getElementById('labReviewModal'))cancelLabReview();};
 (async()=>{const hash=new URLSearchParams(window.location.hash.slice(1));if(hash.get('type')==='recovery'){showResetScreen();return;}const{data:{session}}=await sb.auth.getSession();if(session){sbUserId=session.user.id;const name=session.user.user_metadata?.name||session.user.email.split('@')[0];const{data:prof}=await sb.from('profiles').select('*').eq('id',sbUserId).single();applyProfile(prof,name,session.user.email);showApp();}else{showLanding();}})();
 </script>
