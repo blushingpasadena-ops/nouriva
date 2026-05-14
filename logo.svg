@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" role="img" aria-label="Mivara — Clarity Starts Here">
+  <defs>
+    <style><![CDATA[
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&family=Geist:wght@500&display=swap');
+    ]]></style>
+  </defs>
+  <!-- 4-pointed diamond accent, center (22,28), outer radius 17 -->
+  <path d="M 22,11 Q 17,24 5,28 Q 17,32 22,45 Q 27,32 39,28 Q 27,24 22,11 Z" fill="#2d8653"/>
+  <!-- Wordmark -->
+  <text x="50" y="40"
+    font-family="'Cormorant Garamond', Georgia, serif"
+    font-size="38" font-weight="400" fill="#0f0f0f" letter-spacing="-0.4">Mivara</text>
+  <!-- Tagline -->
+  <text x="51" y="56"
+    font-family="'Geist', system-ui, -apple-system, sans-serif"
+    font-size="8.5" font-weight="500" fill="#2d8653" letter-spacing="3.2">CLARITY STARTS HERE</text>
+</svg>

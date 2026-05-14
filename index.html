@@ -27,14 +27,17 @@
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="Mivara — Your Health, Reclaimed"/>
 <meta property="og:description" content="Track meals with AI, monitor lab biomarkers, and build daily wellness habits — all in one private app."/>
-<meta property="og:image" content="/icon-512.png"/>
+<meta property="og:image" content="https://mivara-ai.vercel.app/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:type" content="image/png"/>
 <meta property="og:url" content="https://mivara-ai.vercel.app"/>
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Mivara — Your Health, Reclaimed"/>
 <meta name="twitter:description" content="Track meals with AI, monitor lab biomarkers, and build daily wellness habits."/>
-<meta name="twitter:image" content="/icon-512.png"/>
+<meta name="twitter:image" content="https://mivara-ai.vercel.app/og-image.png"/>
 
 <!-- Description for search -->
 <meta name="description" content="Mivara is a personal wellness companion for meal tracking, lab biomarker insights, and daily habit building."/>
@@ -62,8 +65,7 @@ body{font-family:'Geist',sans-serif;background:var(--cream);color:var(--ink);min
 
 .landing{display:flex;flex-direction:column;min-height:100vh;background:var(–cream)}
 .l-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:rgba(250,247,242,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(–rule);position:sticky;top:0;z-index:100}
-.v-logo{font-family:‘Cormorant Garamond’,serif;font-size:24px;letter-spacing:-.3px;color:var(–ink)}
-.v-logo span{color:var(–sage)}
+.v-logo{display:flex;align-items:center;line-height:1}
 .l-nav-btns{display:flex;gap:8px}
 .btn-o{padding:9px 18px;border-radius:10px;border:1.5px solid var(–rule);background:transparent;font-size:13px;font-weight:600;cursor:pointer;color:var(–ink2);font-family:‘Geist’,sans-serif;transition:.15s}
 .btn-o:hover{border-color:var(–ink3)}
@@ -160,8 +162,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 
 .auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(–cream);padding:20px}
 .auth-box{background:var(–paper);border:1px solid var(–rule);border-radius:22px;padding:44px 38px;width:100%;max-width:400px;box-shadow:var(–sh-lg)}
-.auth-logo{font-family:‘Cormorant Garamond’,serif;font-size:28px;color:var(–ink);margin-bottom:6px;letter-spacing:-.3px}
-.auth-logo span{color:var(–sage)}
+.auth-logo{margin-bottom:8px;line-height:1}
 .auth-sub{font-size:13px;color:var(–ink3);margin-bottom:32px;line-height:1.5}
 .auth-tabs{display:flex;background:var(–rule2);border-radius:10px;padding:3px;margin-bottom:26px}
 .a-tab{flex:1;padding:8px;border-radius:8px;border:none;background:none;font-size:13px;font-weight:600;color:var(–ink4);cursor:pointer;transition:.15s;font-family:‘Geist’,sans-serif}
@@ -192,8 +193,7 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 .s-logo,.s-user,.s-up{display:none!important}
 }
 .s-logo{padding:26px 22px 18px;border-bottom:1px solid var(–rule2)}
-.s-logo-mark{font-family:‘Cormorant Garamond’,serif;font-size:22px;color:var(–ink);letter-spacing:-.3px}
-.s-logo-mark span{color:var(–sage)}
+.s-logo-mark{line-height:1}
 .s-logo-sub{font-size:10px;color:var(–ink4);letter-spacing:.8px;margin-top:3px;font-weight:600;text-transform:uppercase}
 .s-nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px}
 .ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:all .15s;font-size:14px;font-weight:500;color:var(–ink3);border:none;background:none;width:100%;text-align:left;font-family:‘Geist’,sans-serif}
@@ -380,7 +380,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 
 <div id="landing" class="landing">
   <nav class="l-nav">
-    <div class="v-logo">Miva<span>ra™</span></div>
+    <div class="v-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 38" height="28" aria-label="Mivara" style="display:block"><path d="M 19,10 Q 15,19 5,23 Q 15,27 19,36 Q 23,27 33,23 Q 23,19 19,10 Z" fill="#2d8653"/><text x="42" y="30" font-family="'Cormorant Garamond',Georgia,serif" font-size="30" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text></svg></div>
     <div class="l-nav-btns">
       <button class="btn-o" onclick="showAuth('login')">Sign in</button>
       <button class="btn-f" onclick="showAuth('signup')">Start free →</button>
@@ -480,7 +480,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 
 <div id="authScreen" class="auth-screen hidden">
   <div class="auth-box">
-    <div class="auth-logo">Miva<span>ra™</span></div>
+    <div class="auth-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 60" height="44" aria-label="Mivara" style="display:block"><path d="M 21,10 Q 17,22 5,26 Q 17,30 21,42 Q 25,30 37,26 Q 25,22 21,10 Z" fill="#2d8653"/><text x="48" y="36" font-family="'Cormorant Garamond',Georgia,serif" font-size="34" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text><text x="49" y="53" font-family="'Geist',system-ui,sans-serif" font-size="8" font-weight="500" fill="#2d8653" letter-spacing="3.0">CLARITY STARTS HERE</text></svg></div>
     <p class="auth-sub">Your personal health OS — built around your lab results.</p>
     <div class="auth-tabs">
       <button class="a-tab on" id="aTabLogin" onclick="switchTab('login')">Sign in</button>
@@ -515,7 +515,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 
 <div id="resetScreen" class="auth-screen hidden">
   <div class="auth-box">
-    <div class="auth-logo">Miva<span>ra™</span></div>
+    <div class="auth-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 60" height="44" aria-label="Mivara" style="display:block"><path d="M 21,10 Q 17,22 5,26 Q 17,30 21,42 Q 25,30 37,26 Q 25,22 21,10 Z" fill="#2d8653"/><text x="48" y="36" font-family="'Cormorant Garamond',Georgia,serif" font-size="34" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text><text x="49" y="53" font-family="'Geist',system-ui,sans-serif" font-size="8" font-weight="500" fill="#2d8653" letter-spacing="3.0">CLARITY STARTS HERE</text></svg></div>
     <p class="auth-sub" style="margin-bottom:24px">Choose a new password for your account.</p>
     <div id="rErr" class="a-err hidden"></div>
     <div class="fld"><label>New password</label><input type="password" id="rPass" placeholder="At least 8 characters"/></div>
@@ -527,7 +527,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 <div id="onboardScreen" class="auth-screen hidden">
   <div class="auth-box ob-scroll" style="max-width:500px">
     <div id="obStep1">
-      <div class="auth-logo">Miva<span>ra™</span></div>
+      <div class="auth-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 60" height="44" aria-label="Mivara" style="display:block"><path d="M 21,10 Q 17,22 5,26 Q 17,30 21,42 Q 25,30 37,26 Q 25,22 21,10 Z" fill="#2d8653"/><text x="48" y="36" font-family="'Cormorant Garamond',Georgia,serif" font-size="34" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text><text x="49" y="53" font-family="'Geist',system-ui,sans-serif" font-size="8" font-weight="500" fill="#2d8653" letter-spacing="3.0">CLARITY STARTS HERE</text></svg></div>
       <div class="ob-step">Step 1 of 2 — Food Background</div>
       <p class="auth-sub">What food cultures do you identify with? We'll personalize your meal insights. Select all that apply.</p>
       <div id="foodChips" style="margin-bottom:12px"></div>
@@ -536,7 +536,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
       <button style="width:100%;padding:10px;margin-top:8px;border:none;background:none;color:var(--ink4);font-size:13px;cursor:pointer;font-family:'Geist',sans-serif" onclick="obNext1()">Skip this step</button>
     </div>
     <div id="obStep2" class="hidden">
-      <div class="auth-logo">Miva<span>ra</span></div>
+      <div class="auth-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 60" height="44" aria-label="Mivara" style="display:block"><path d="M 21,10 Q 17,22 5,26 Q 17,30 21,42 Q 25,30 37,26 Q 25,22 21,10 Z" fill="#2d8653"/><text x="48" y="36" font-family="'Cormorant Garamond',Georgia,serif" font-size="34" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text><text x="49" y="53" font-family="'Geist',system-ui,sans-serif" font-size="8" font-weight="500" fill="#2d8653" letter-spacing="3.0">CLARITY STARTS HERE</text></svg></div>
       <div class="ob-step">Step 2 of 2 — Health Preferences</div>
       <p class="auth-sub" style="margin-bottom:20px">You can update these anytime in your profile.</p>
       <div class="ob-toggle-row">
@@ -567,7 +567,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 
 <div id="mainApp" class="app">
   <div class="sidebar">
-    <div class="s-logo"><div class="s-logo-mark">Miva<span>ra™</span></div><div class="s-logo-sub">Health OS</div></div>
+    <div class="s-logo"><div class="s-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 38" height="28" aria-label="Mivara" style="display:block"><path d="M 19,10 Q 15,19 5,23 Q 15,27 19,36 Q 23,27 33,23 Q 23,19 19,10 Z" fill="#2d8653"/><text x="42" y="30" font-family="'Cormorant Garamond',Georgia,serif" font-size="30" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text></svg></div><div class="s-logo-sub">Health OS</div></div>
     <div class="s-nav">
       <button class="ni on" onclick="goTab('habits',this)"><span class="ni-icon">✦</span><span class="ni-label">Habits</span><span class="ni-badge" id="todayBadge">0</span></button>
       <button class="ni" onclick="goTab('exercise',this)"><span class="ni-icon">🏃</span><span class="ni-label">Exercise</span></button>

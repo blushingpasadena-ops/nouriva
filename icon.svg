@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="#2d8653"/>
-  <!-- M lettermark -->
-  <path d="M 108,400 L 108,120 L 256,268 L 404,120 L 404,400 L 344,400 L 344,214 L 256,314 L 168,214 L 168,400 Z" fill="white"/>
-  <!-- Leaf accent -->
-  <path d="M 256,314 C 256,314 232,350 228,380 C 244,368 256,355 256,355 C 256,355 268,368 284,380 C 280,350 256,314 256,314 Z" fill="rgba(255,255,255,0.45)"/>
+  <!-- White 4-pointed diamond star, center (256,256), outer radius 178 -->
+  <!-- Quadratic bezier sides create the characteristic concave ✦ shape -->
+  <path d="M 256,78 Q 215,215 78,256 Q 215,297 256,434 Q 297,297 434,256 Q 297,215 256,78 Z" fill="white"/>
 </svg>
