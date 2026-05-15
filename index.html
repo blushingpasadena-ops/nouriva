@@ -27,17 +27,17 @@
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="Mivara — Your Health, Reclaimed"/>
 <meta property="og:description" content="Track meals with AI, monitor lab biomarkers, and build daily wellness habits — all in one private app."/>
-<meta property="og:image" content="https://mivara-ai.vercel.app/og-image.png"/>
+<meta property="og:image" content="https://mivara.ai/og-image.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta property="og:image:type" content="image/png"/>
-<meta property="og:url" content="https://mivara-ai.vercel.app"/>
+<meta property="og:url" content="https://mivara.ai"/>
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Mivara — Your Health, Reclaimed"/>
 <meta name="twitter:description" content="Track meals with AI, monitor lab biomarkers, and build daily wellness habits."/>
-<meta name="twitter:image" content="https://mivara-ai.vercel.app/og-image.png"/>
+<meta name="twitter:image" content="https://mivara.ai/og-image.png"/>
 
 <!-- Description for search -->
 <meta name="description" content="Mivara is a personal wellness companion for meal tracking, lab biomarker insights, and daily habit building."/>
@@ -47,6 +47,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
 <style>
 :root{
   --ink:#0f0f0f;--ink2:#2e2e2e;--ink3:#5a5a5a;--ink4:#9a9a9a;
@@ -592,6 +593,11 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
     <div class="s-up" id="upgradePanel"></div>
   </div>
   <div class="main-content">
+    <!-- Pilot expiry banner (shown when ≤ 7 days remain) -->
+    <div id="pilotBanner" style="display:none;background:linear-gradient(135deg,#9d6024,#b8742a);color:white;padding:10px 16px;border-radius:10px;margin-bottom:20px;align-items:center;justify-content:space-between;gap:12px;font-family:'Geist',sans-serif">
+      <span id="pilotBannerText" style="font-size:13px;line-height:1.5;flex:1"></span>
+      <button onclick="localStorage.setItem('mivara_pilot_dismissed','1');document.getElementById('pilotBanner').style.display='none'" style="background:rgba(255,255,255,.2);border:none;color:white;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
     <div id="tab-habits">
       <div class="pg-head"><div class="pg-title" id="pgTitle">Today</div><div class="pg-sub" id="pgDate"></div></div>
       <div class="stats-r">
@@ -858,7 +864,7 @@ const sb=supabase.createClient('https://cwzdybtfkqflqphpenku.supabase.co','sb_pu
 let sbUserId=null;
 function gs(){try{return JSON.parse(localStorage.getItem(SK))||ds()}catch{return ds()}}
 function ss(s){localStorage.setItem(SK,JSON.stringify(s))}
-function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null,foodBackground:[],otherFoodBackground:'',cycleSync:false,cycleStartDate:'',cycleLifeStage:'',trialStart:null,labs:[],labConsent:null,feedbackShown:[]}}
+function ds(){return{user:null,subscribed:false,habits:[],completions:{},meals:[],exercise:null,joinedDate:null,foodBackground:[],otherFoodBackground:'',cycleSync:false,cycleStartDate:'',cycleLifeStage:'',trialStart:null,labs:[],labConsent:null,feedbackShown:[],pilotExpiresAt:null}}
 let S=gs();let pChrt=null,sChrt=null;
 const ICONS=['🌿','🏃','💊','🐟','🥗','🧘','💪','🍵','📚','🌙','☀️','🥦','🧴','💧','🧠','❤️','🏋️','🎯','✨','🫁','🩸','🧬','🏊','🚴','⛳','🎾','🥊','🏄','🧗'];
 const EXERCISES=[
@@ -882,7 +888,7 @@ function showApp(){document.getElementById('landing').style.display='none';docum
 function switchTab(t){const fg=t==='forgot';document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('forgotForm').classList.toggle('hidden',!fg);document.querySelector('.auth-tabs').style.display=fg?'none':'';document.getElementById('authDivider').style.display=fg?'none':'';document.getElementById('authGuest').style.display=fg?'none':'';if(fg){document.getElementById('forgotEmailWrap').style.display='';document.getElementById('forgotBtn').style.display='';document.getElementById('aSuccess').classList.add('hidden');}document.getElementById('aErr').classList.add('hidden');}
 function showErr(m){const e=document.getElementById('aErr');e.textContent=m;e.classList.remove('hidden')}
 async function doLogin(){const email=document.getElementById('lEmail').value.trim();const pass=document.getElementById('lPass').value;if(!email||!pass)return showErr('Please fill in all fields.');const btn=document.querySelector('#loginForm .a-submit');btn.textContent='Signing in…';btn.disabled=true;const{data,error}=await sb.auth.signInWithPassword({email,password:pass});btn.textContent='Sign in →';btn.disabled=false;if(error)return showErr(error.message);const name=data.user.user_metadata?.name||email.split('@')[0];sbUserId=data.user.id;const{data:prof}=await sb.from('profiles').select('*').eq('id',sbUserId).single();applyProfile(prof,name,email);persist();showApp();toast('Welcome back, '+name.split(' ')[0]+'! 👋');}
-async function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const btn=document.querySelector('#signupForm .a-submit');btn.textContent='Creating…';btn.disabled=true;const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});btn.textContent='Create account →';btn.disabled=false;if(error)return showErr(error.message);if(!data.session){showErr('Check your email to confirm your account, then sign in.');switchTab('login');return;}sbUserId=data.user.id;const starter=starterHabits();await sb.from('profiles').upsert({id:sbUserId,email,full_name:name,trial_start:td(),habits:starter,completions:{},meals:[],labs:[]});S=ds();S.user={name,email};S.trialStart=td();S.habits=starter;ss(S);showOnboarding();}
+async function doSignup(){const name=document.getElementById('sName').value.trim();const email=document.getElementById('sEmail').value.trim();const pass=document.getElementById('sPass').value;if(!name||!email||!pass)return showErr('Please fill in all fields.');if(pass.length<8)return showErr('Password needs at least 8 characters.');if(!email.includes('@'))return showErr('Please enter a valid email.');const btn=document.querySelector('#signupForm .a-submit');btn.textContent='Creating…';btn.disabled=true;const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});btn.textContent='Create account →';btn.disabled=false;if(error)return showErr(error.message);if(!data.session){showErr('Check your email to confirm your account, then sign in.');switchTab('login');return;}sbUserId=data.user.id;const starter=starterHabits();const _ped=new Date();_ped.setDate(_ped.getDate()+30);const pilotExpiresAt=_ped.toISOString().split('T')[0];await sb.from('profiles').upsert({id:sbUserId,email,full_name:name,trial_start:td(),pilot_expires_at:pilotExpiresAt,habits:starter,completions:{},meals:[],labs:[]});S=ds();S.user={name,email};S.trialStart=td();S.pilotExpiresAt=pilotExpiresAt;S.habits=starter;ss(S);showOnboarding();}
 function doGuest(){S=ds();S.user={name:'Demo User',email:'guest@mivara.ai'};S.joinedDate=td();S.habits=starterHabits();ss(S);showApp();toast('Exploring as Guest 👋')}
 async function doForgotPassword(){const email=document.getElementById('fEmail').value.trim();if(!email)return showErr('Please enter your email address.');const btn=document.getElementById('forgotBtn');btn.textContent='Sending…';btn.disabled=true;const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href.split('#')[0]});btn.textContent='Send reset link →';btn.disabled=false;if(error)return showErr(error.message);document.getElementById('aSuccess').classList.remove('hidden');document.getElementById('forgotEmailWrap').style.display='none';btn.style.display='none';}
 function showResetScreen(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('resetScreen').classList.remove('hidden');document.getElementById('mainApp').classList.remove('on');}
@@ -912,16 +918,17 @@ function persist(){
       completions:jObj(S.completions),
       meals:jArr(S.meals),
       labs:jArr(S.labs),
-      feedback_shown:jArr(S.feedbackShown)
+      feedback_shown:jArr(S.feedbackShown),
+      pilot_expires_at:S.pilotExpiresAt||null
     };
     sb.from('profiles').upsert(row).then(({error})=>{
       if(error)console.error('[persist] profiles upsert failed:',error.code,error.message,error.details);
     });
   }
 }
-function applyProfile(prof,name,email){S=ds();S.user={name:prof?.full_name||name,email};S.subscribed=prof?.is_paid||false;S.habits=prof?.habits||[];S.completions=prof?.completions||{};S.meals=prof?.meals||[];S.exercise=prof?.exercise||null;S.foodBackground=prof?.food_background||[];S.cycleSync=prof?.cycle_sync||false;S.cycleStartDate=prof?.cycle_start_date||'';S.cycleLifeStage=prof?.cycle_life_stage||'';S.trialStart=prof?.trial_start||null;S.labs=prof?.labs||[];S.labConsent=prof?.lab_consent||null;S.feedbackShown=prof?.feedback_shown||[];}
+function applyProfile(prof,name,email){S=ds();S.user={name:prof?.full_name||name,email};S.subscribed=prof?.is_paid||false;S.habits=prof?.habits||[];S.completions=prof?.completions||{};S.meals=prof?.meals||[];S.exercise=prof?.exercise||null;S.foodBackground=prof?.food_background||[];S.cycleSync=prof?.cycle_sync||false;S.cycleStartDate=prof?.cycle_start_date||'';S.cycleLifeStage=prof?.cycle_life_stage||'';S.trialStart=prof?.trial_start||null;S.labs=prof?.labs||[];S.labConsent=prof?.lab_consent||null;S.feedbackShown=prof?.feedback_shown||[];S.pilotExpiresAt=prof?.pilot_expires_at||null;}
 function starterHabits(){return[{id:uid(),name:'Morning iron supplement + vitamin C',icon:'💊',created:td()},{id:uid(),name:'Eat fatty fish or take omega-3',icon:'🐟',created:td()},{id:uid(),name:'Barley-rice blend at dinner',icon:'🌿',created:td()},{id:uid(),name:'Magnesium glycinate before bed',icon:'🌙',created:td()},];}
-function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('habits',document.querySelector('.ni'));}
+function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('habits',document.querySelector('.ni'));checkPilotBanner();}
 function updateSubUI(){
   const sub=S.subscribed,trial=isTrialActive(),prem=isPremium(),dl=trialDaysLeft(),rem=Math.max(0,1-scansToday());
   const badge=document.getElementById('subBadge');
@@ -969,9 +976,21 @@ function toggleMic(id){const SR=window.SpeechRecognition||window.webkitSpeechRec
 function showStripeModal(){document.getElementById('stripeModal').classList.add('on');}
 function closeStripeModal(){document.getElementById('stripeModal').classList.remove('on');}
 function confirmSub(){S.subscribed=true;persist();closeStripeModal();updateSubUI();toast('🎉 Welcome to Mivara Premium!');}
-function isPremium(){return S.subscribed||isTrialActive();}
+function isPremium(){return S.subscribed||isTrialActive()||isPilotActive();}
 function isTrialActive(){if(!S.trialStart||S.subscribed)return false;return Math.floor((Date.now()-new Date(S.trialStart+'T00:00:00').getTime())/86400000)<14;}
 function trialDaysLeft(){if(!S.trialStart||S.subscribed)return 0;return Math.max(0,14-Math.floor((Date.now()-new Date(S.trialStart+'T00:00:00').getTime())/86400000));}
+function isPilotActive(){if(!S.pilotExpiresAt||S.subscribed)return false;return new Date(S.pilotExpiresAt+'T23:59:59')>new Date();}
+function pilotDaysLeft(){if(!S.pilotExpiresAt)return 0;return Math.max(0,Math.ceil((new Date(S.pilotExpiresAt+'T23:59:59')-new Date())/86400000));}
+function checkPilotBanner(){
+  if(!S.pilotExpiresAt||!isPilotActive())return;
+  if(localStorage.getItem('mivara_pilot_dismissed'))return;
+  const d=pilotDaysLeft();
+  if(d>7)return;
+  const text=document.getElementById('pilotBannerText');
+  if(text)text.textContent='Your founding member access expires in '+d+' day'+(d===1?'':'s')+' — upgrade to keep full access.';
+  const banner=document.getElementById('pilotBanner');
+  if(banner)banner.style.display='flex';
+}
 function scansToday(){return S.meals.filter(m=>m.date===td()).length;}
 function canScan(){return isPremium()||scansToday()<1;}
 function showScanLimitModal(){document.getElementById('scanLimitModal').classList.add('on');}
