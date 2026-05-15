@@ -10,6 +10,24 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No image data received' });
     }
 
+    const prompt = `You are a world-class nutrition and culinary expert with deep knowledge of global cuisines.
+
+Analyze this meal photo carefully using these steps:
+
+1. IDENTIFY CULTURAL CONTEXT: Look for visual cues — chopsticks, wok char marks, banana leaf, clay pots, dim sum steamers, tortillas, injera, tiffin boxes, Korean stone bowls (dolsot), lotus leaf wrapping, Thai mortar and pestle dishes, etc. Identify the cuisine and name the dish in its authentic cultural context. Examples: "Hainanese Chicken Rice" not "chicken and rice"; "Dal Makhani with Jeera Rice" not "lentils and rice"; "Pad See Ew" not "stir-fried noodles"; "Injera with Misir Wat" not "flatbread with stew".
+
+2. PORTION CALIBRATION: Apply culturally appropriate portion norms — do NOT default to Western restaurant plate assumptions. Asian rice dishes are typically served in smaller bowls (150–200g cooked rice). Indian thali steel plates have multiple small portions. Dim sum pieces are individual bite-sized servings. Japanese bento boxes have compartmentalized smaller portions. Mexican street tacos are 2–3 small tortillas. Adjust your calorie estimates accordingly.
+
+3. COMPONENT BREAKDOWN: For mixed dishes — curries, stews, soups, rice bowls, noodle dishes — estimate each major component separately, then sum the totals. Example: for a Thai green curry bowl, estimate: jasmine rice (180g cooked = ~235 kcal), green curry with chicken (200g = ~280 kcal), then sum. Show your component reasoning in the ldl_note field if helpful.
+
+4. CONFIDENCE: Rate "high" if the dish is clearly identifiable and portions are visible. Rate "medium" if recognizable but portion size or exact ingredients are uncertain. Rate "low" if the image is unclear, heavily obscured, or too ambiguous to analyze reliably.
+
+Respond with ONLY a raw JSON object — no markdown, no backticks, no explanation before or after:
+
+{"meal_name":"culturally accurate dish name","cultural_context":"cuisine or region e.g. Cantonese, South Indian, Mexican Yucatecan","confidence":"high|medium|low","calories":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fiber_g":number,"iron_mg":number,"ldl_impact":"positive|neutral|negative","ldl_note":"one sentence on main fat or cholesterol driver","insights":["string","string","string"]}
+
+If the image is too unclear, return the JSON with null for all numeric fields and "low" for confidence.`;
+
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
@@ -24,9 +42,7 @@ export default async function handler(req, res) {
                   data: imageData
                 }
               },
-              {
-                text: 'You are a nutrition expert. Analyze this meal photo and respond with ONLY a JSON object using these exact keys: meal_name, calories, protein_g, carbs_g, fat_g, fiber_g, iron_mg, ldl_impact (positive/neutral/negative), ldl_note, insights (array of 3 strings). No markdown. No backticks. Just raw JSON.'
-              }
+              { text: prompt }
             ]
           }],
           generationConfig: {
@@ -51,8 +67,19 @@ export default async function handler(req, res) {
     }
 
     const text = geminiData.candidates[0].content.parts[0].text;
-    const clean = text.replace(/```json/g,'').replace(/```/g,'').trim();
-    const result = JSON.parse(clean);
+    const stripped = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    let result;
+    try {
+      result = JSON.parse(stripped);
+    } catch (_) {
+      const match = stripped.match(/\{[\s\S]*\}/);
+      if (!match) return res.status(500).json({ error: 'No JSON in Gemini response' });
+      try { result = JSON.parse(match[0]); }
+      catch (e) { return res.status(500).json({ error: 'JSON parse failed: ' + e.message }); }
+    }
+
+    if (!result.confidence) result.confidence = 'medium';
     return res.status(200).json(result);
 
   } catch (error) {
