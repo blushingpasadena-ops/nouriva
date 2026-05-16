@@ -29,30 +29,37 @@ Raw JSON object (start immediately with {):
 
 If the image is too unclear, return the JSON with null for all numeric fields and "low" for confidence.`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                inline_data: {
-                  mime_type: mimeType || 'image/jpeg',
-                  data: imageData
-                }
-              },
-              { text: prompt }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 2048,
-          }
-        })
+    const geminiBody = JSON.stringify({
+      contents: [{
+        parts: [
+          {
+            inline_data: {
+              mime_type: mimeType || 'image/jpeg',
+              data: imageData
+            }
+          },
+          { text: prompt }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 2048,
       }
-    );
+    });
+
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+    let geminiRes;
+    for (let attempt = 0; attempt <= 2; attempt++) {
+      geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: geminiBody }
+      );
+      if (geminiRes.ok || ![500, 503].includes(geminiRes.status)) break;
+      if (attempt < 2) {
+        console.warn(`Gemini ${geminiRes.status}, retrying (attempt ${attempt + 1})…`);
+        await delay(1000);
+      }
+    }
 
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();

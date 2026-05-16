@@ -1,4 +1,4 @@
-const CACHE = 'mivara-v2';
+const CACHE = 'mivara-v3';
 
 // App shell — cache on install
 const SHELL = [
