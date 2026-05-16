@@ -193,7 +193,11 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 .main-content{margin-left:0;padding:18px 14px 80px}
 .s-nav{display:flex!important;flex-direction:row;gap:4px;flex:1;overflow-x:auto}
 .s-nav .ni{flex-direction:row;gap:5px;padding:7px 10px;font-size:12px;white-space:nowrap}
-.s-logo,.s-user,.s-up{display:none!important}
+.s-user,.s-up{display:none!important}
+.s-logo{padding:0 6px;border-bottom:none;display:flex!important;align-items:center}
+.s-logo-sub{display:none}
+.logo-full{display:none!important}
+.logo-mark{display:block!important}
 }
 .s-logo{padding:26px 22px 18px;border-bottom:1px solid var(–rule2)}
 .s-logo-mark{line-height:1}
@@ -609,7 +613,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 
 <div id="mainApp" class="app">
   <div class="sidebar">
-    <div class="s-logo" onclick="showLanding()" style="cursor:pointer" title="Back to home"><div class="s-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 38" height="28" aria-label="Mivara" style="display:block"><path d="M 19,10 Q 15,19 5,23 Q 15,27 19,36 Q 23,27 33,23 Q 23,19 19,10 Z" fill="#2d8653"/><text x="42" y="30" font-family="'Cormorant Garamond',Georgia,serif" font-size="30" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text></svg></div><div class="s-logo-sub">Health OS</div></div>
+    <div class="s-logo" onclick="showLanding()" style="cursor:pointer" title="Back to home"><div class="s-logo-mark"><svg class="logo-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 38" height="28" aria-label="Mivara" style="display:block"><path d="M 19,10 Q 15,19 5,23 Q 15,27 19,36 Q 23,27 33,23 Q 23,19 19,10 Z" fill="#2d8653"/><text x="42" y="30" font-family="'Cormorant Garamond',Georgia,serif" font-size="30" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text></svg><svg class="logo-mark" xmlns="http://www.w3.org/2000/svg" viewBox="5 10 28 26" height="26" width="26" aria-label="Mivara" style="display:none"><path d="M 19,10 Q 15,19 5,23 Q 15,27 19,36 Q 23,27 33,23 Q 23,19 19,10 Z" fill="#2d8653"/></svg></div><div class="s-logo-sub">Health OS</div></div>
     <div class="s-nav">
       <button class="ni on" onclick="goTab('habits',this)"><span class="ni-icon">✦</span><span class="ni-label">Habits</span><span class="ni-badge" id="todayBadge">0</span></button>
       <button class="ni" onclick="goTab('exercise',this)"><span class="ni-icon">🏃</span><span class="ni-label">Exercise</span></button>
@@ -673,7 +677,8 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
     </div>
     <div id="tab-meals" class="hidden">
       <div class="pg-head" style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="pg-title">Meal Log</div><div class="pg-sub">AI-powered — snap a photo, get full nutrition</div></div><button class="export-btn" onclick="showExportModal()" style="margin-top:6px">📄 Export Diary</button></div>
-      <div class="meal-up" id="appUpload"><input type="file" accept="image/*" onchange="runAppMeal(this)"/><div style="font-size:30px;margin-bottom:10px">📸</div><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px">Upload a meal photo</div><div style="font-size:12px;color:var(--ink4)">AI identifies food, counts calories, checks your LDL impact</div></div>
+      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--sage);text-align:center;margin:0 0 16px;letter-spacing:-0.2px">Every meal tells a story. Mivara listens.</p>
+      <div class="meal-up" id="appUpload"><input type="file" accept="image/*" onchange="runAppMeal(this)"/><div style="font-size:30px;margin-bottom:10px">📸</div><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px">Upload a meal photo</div><div style="font-size:12px;color:var(--ink4)">AI identifies your meal, breaks down every nutrient, and connects what you eat to your personal health picture</div></div>
       <div class="ana-bar-app" id="appAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">Analyzing with AI…</span></div>
       <div class="sec-label">Today's meals</div>
       <div class="meal-entries-l" id="mealList"></div>
@@ -998,7 +1003,7 @@ function persist(){
 }
 function applyProfile(prof,name,email){S=ds();S.user={name:prof?.full_name||name,email};S.subscribed=prof?.is_paid||false;S.habits=prof?.habits||[];S.completions=prof?.completions||{};S.meals=prof?.meals||[];S.exercise=prof?.exercise||null;S.foodBackground=prof?.food_background||[];S.cycleSync=prof?.cycle_sync||false;S.cycleStartDate=prof?.cycle_start_date||'';S.cycleLifeStage=prof?.cycle_life_stage||'';S.trialStart=prof?.trial_start||null;S.labs=prof?.labs||[];S.labConsent=prof?.lab_consent||null;S.feedbackShown=prof?.feedback_shown||[];S.pilotExpiresAt=prof?.pilot_expires_at||null;}
 function starterHabits(){return[{id:uid(),name:'Morning iron supplement + vitamin C',icon:'💊',created:td(),days:[]},{id:uid(),name:'Eat fatty fish or take omega-3',icon:'🐟',created:td(),days:[]},{id:uid(),name:'Barley-rice blend at dinner',icon:'🌿',created:td(),days:[]},{id:uid(),name:'Magnesium glycinate before bed',icon:'🌙',created:td(),days:[]},];}
-function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('habits',document.querySelector('.ni'));checkPilotBanner();}
+function initApp(){const u=S.user;document.getElementById('sUserName').textContent=u?.name||'Guest';document.getElementById('sUserEmail').textContent=u?.email||'';document.getElementById('profName').textContent=u?.name||'Guest';document.getElementById('profEmail').textContent=u?.email||'';document.getElementById('profAv').textContent=u?.name?u.name[0].toUpperCase():'?';updateSubUI();buildIconPicker();buildExGrid();renderHabits();updateStats();document.getElementById('pgDate').textContent=dateLabel(td());goTab('meals',document.querySelector('.ni[onclick*="meals"]'));checkPilotBanner();}
 function updateSubUI(){
   const sub=S.subscribed,trial=isTrialActive(),prem=isPremium(),dl=trialDaysLeft(),rem=Math.max(0,1-scansToday());
   const badge=document.getElementById('subBadge');
