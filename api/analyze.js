@@ -48,7 +48,7 @@ If the image is too unclear, return the JSON with null for all numeric fields an
           }],
           generationConfig: {
             temperature: 0.1,
-            maxOutputTokens: 1024,
+            maxOutputTokens: 2048,
           }
         })
       }
@@ -68,7 +68,7 @@ If the image is too unclear, return the JSON with null for all numeric fields an
     }
 
     const text = geminiData.candidates[0].content.parts[0].text;
-    console.log('[analyze] raw Gemini text:', text.slice(0, 500));
+    console.log('[analyze] raw Gemini text:', text.slice(0, 600));
 
     const stripped = text
       .replace(/```(?:json)?\s*/gi, '')
@@ -76,19 +76,27 @@ If the image is too unclear, return the JSON with null for all numeric fields an
       .trim();
 
     let result;
-    try {
-      result = JSON.parse(stripped);
-    } catch (_) {
+
+    // 1. Try raw text directly (Gemini often returns clean JSON)
+    try { result = JSON.parse(text.trim()); } catch (_) {}
+
+    // 2. Try after stripping markdown fences
+    if (!result) {
+      try { result = JSON.parse(stripped); } catch (_) {}
+    }
+
+    // 3. Extract outermost {...} and parse that
+    if (!result) {
       const match = stripped.match(/\{[\s\S]*\}/);
       if (!match) {
-        console.error('[analyze] no JSON found. Raw text:', text.slice(0, 300));
-        return res.status(500).json({ error: 'No JSON in Gemini response', raw: text.slice(0, 300) });
+        console.error('[analyze] no JSON found. Raw text:', text.slice(0, 500));
+        return res.status(500).json({ error: 'No JSON in Gemini response', raw: text.slice(0, 500) });
       }
       try {
         result = JSON.parse(match[0]);
       } catch (e) {
-        console.error('[analyze] JSON parse failed:', e.message, '| raw:', text.slice(0, 300));
-        return res.status(500).json({ error: 'JSON parse failed: ' + e.message, raw: text.slice(0, 300) });
+        console.error('[analyze] JSON parse failed:', e.message, '| raw:', text.slice(0, 500));
+        return res.status(500).json({ error: 'JSON parse failed: ' + e.message, raw: text.slice(0, 500) });
       }
     }
 
