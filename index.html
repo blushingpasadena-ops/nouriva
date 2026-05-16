@@ -84,6 +84,8 @@ h1.hero-h em{font-style:italic;color:var(–sage)}
 .btn-hero-s{padding:15px 26px;border-radius:14px;border:1.5px solid var(–rule);background:white;color:var(–ink);font-size:15px;font-weight:600;cursor:pointer;font-family:‘Geist’,sans-serif;transition:.15s}
 .btn-hero-s:hover{border-color:var(–ink3)}
 .hero-note{font-size:13px;color:var(–ink4);margin-top:16px}
+#mobileLandingBar{display:none;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(250,247,242,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(–rule);position:sticky;top:0;z-index:101}
+@media(max-width:640px){.landing.logged-in .l-nav{display:none}.landing.logged-in #mobileLandingBar{display:flex}}
 
 .for-whom{max-width:840px;margin:0 auto;padding:20px 32px 60px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 @media(max-width:640px){.for-whom{grid-template-columns:1fr}}
@@ -404,6 +406,10 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
 <body>
 
 <div id="landing" class="landing">
+  <div id="mobileLandingBar">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 38" height="26" aria-label="Mivara" style="display:block"><path d="M 19,10 Q 15,19 5,23 Q 15,27 19,36 Q 23,27 33,23 Q 23,19 19,10 Z" fill="#2d8653"/><text x="42" y="30" font-family="'Cormorant Garamond',Georgia,serif" font-size="30" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text></svg>
+    <button class="btn-f" onclick="showApp()">Continue to app →</button>
+  </div>
   <nav class="l-nav">
     <div class="v-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 38" height="28" aria-label="Mivara" style="display:block"><path d="M 19,10 Q 15,19 5,23 Q 15,27 19,36 Q 23,27 33,23 Q 23,19 19,10 Z" fill="#2d8653"/><text x="42" y="30" font-family="'Cormorant Garamond',Georgia,serif" font-size="30" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text></svg></div>
     <div class="l-nav-btns">
@@ -431,7 +437,7 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
       <div class="upload-z" id="landingZone" style="padding:52px 20px;border-width:2.5px">
         <input type="file" accept="image/*" onchange="runLandingAnalysis(this)"/>
         <div class="u-icon" style="font-size:44px;margin-bottom:14px">📸</div>
-        <div class="u-title" style="font-size:16px;margin-bottom:8px">Snap a photo of your meal</div>
+        <div class="u-title" style="font-size:16px;margin-bottom:8px">Tap to upload a meal photo</div>
         <div class="u-sub">Made for real food — home cooked, culturally rich, and full of flavor</div>
       </div>
       <div class="ana-bar" id="landingAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">AI is analyzing your meal…</span></div>
@@ -917,7 +923,8 @@ const EXERCISES=[
 ];
 const EX_QUICK_HABITS={tennis:['🎾 Play tennis or hit a wall','🏃 30 min cardio warm-up','💪 Core + shoulder stability'],running:['🏃 Run 30+ min','💪 Strength cross-train 2x/wk','🧘 Post-run stretch 10 min'],cycling:['🚴 Cycle 45+ min','💪 Leg strength training','🏃 Active recovery walk'],swimming:['🏊 Swim 30+ min','💪 Dryland strength training','🧘 Mobility & flexibility'],yoga:['🧘 Yoga 30+ min','🏃 Light cardio 20 min','💪 Bodyweight strength 2x/wk'],weights:['🏋️ Lift weights 45+ min','🏃 Cardio 20 min 3x/wk','🧘 Stretch & recover'],walking:['🚶 Walk 30+ min','💪 Light resistance training','🧘 Evening wind-down walk'],golf:['⛳ Golf round or range','🏃 Walk instead of cart','💪 Rotational strength training'],hiit:['🥊 HIIT session 30 min','🏃 Active recovery walk','💪 Strength 2x/wk'],pilates:['🤸 Pilates 45 min','🏃 Cardio 20 min','🧘 Breathwork 10 min'],surf:['🏄 Surf session','💪 Paddle strength training','🧘 Balance & flexibility'],climbing:['🧗 Climb session','💪 Antagonist training','🤸 Finger tendon warm-up'],};
 function showLanding(){
-  document.getElementById('landing').style.display='';
+  const landingEl=document.getElementById('landing');
+  landingEl.style.display='';
   document.getElementById('authScreen').classList.add('hidden');
   document.getElementById('mainApp').classList.remove('on');
   const lo=document.getElementById('navLoggedOut');
@@ -925,6 +932,7 @@ function showLanding(){
   const signupRow=document.getElementById('landingSignupRow');
   const signupNote=document.getElementById('landingSignupNote');
   if(sbUserId&&S.user){
+    landingEl.classList.add('logged-in');
     if(lo)lo.style.display='none';
     if(li){li.style.display='flex';const w=document.getElementById('navWelcome');if(w)w.textContent='Hi, '+S.user.name.split(' ')[0]+' ✦';}
     if(signupRow)signupRow.style.display='none';
@@ -934,6 +942,7 @@ function showLanding(){
     if(ctaBtn){ctaBtn.textContent='Continue to app →';ctaBtn.onclick=showApp;}
     if(ctaText)ctaText.textContent='Ready to log this meal and track your habits?';
   }else{
+    landingEl.classList.remove('logged-in');
     if(lo)lo.style.display='flex';
     if(li)li.style.display='none';
     if(signupRow)signupRow.style.display='flex';
