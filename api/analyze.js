@@ -22,8 +22,9 @@ Analyze this meal photo carefully using these steps:
 
 4. CONFIDENCE: Rate "high" if the dish is clearly identifiable and portions are visible. Rate "medium" if recognizable but portion size or exact ingredients are uncertain. Rate "low" if the image is unclear, heavily obscured, or too ambiguous to analyze reliably.
 
-Respond with ONLY a raw JSON object — no markdown, no backticks, no explanation before or after:
+CRITICAL INSTRUCTION: Your entire response must be a single raw JSON object — nothing else. No markdown. No code blocks. No backticks. No triple backticks. No "json" tag. No preamble. No explanation. No trailing text. Your response must start with { and end with }. Do not write anything before { or after }.
 
+Raw JSON object (start immediately with {):
 {"meal_name":"culturally accurate dish name","cultural_context":"cuisine or region e.g. Cantonese, South Indian, Mexican Yucatecan","confidence":"high|medium|low","calories":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fiber_g":number,"iron_mg":number,"ldl_impact":"positive|neutral|negative","ldl_note":"one sentence on main fat or cholesterol driver","insights":["string","string","string"]}
 
 If the image is too unclear, return the JSON with null for all numeric fields and "low" for confidence.`;
@@ -67,16 +68,28 @@ If the image is too unclear, return the JSON with null for all numeric fields an
     }
 
     const text = geminiData.candidates[0].content.parts[0].text;
-    const stripped = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    console.log('[analyze] raw Gemini text:', text.slice(0, 500));
+
+    const stripped = text
+      .replace(/```(?:json)?\s*/gi, '')
+      .replace(/`/g, '')
+      .trim();
 
     let result;
     try {
       result = JSON.parse(stripped);
     } catch (_) {
       const match = stripped.match(/\{[\s\S]*\}/);
-      if (!match) return res.status(500).json({ error: 'No JSON in Gemini response' });
-      try { result = JSON.parse(match[0]); }
-      catch (e) { return res.status(500).json({ error: 'JSON parse failed: ' + e.message }); }
+      if (!match) {
+        console.error('[analyze] no JSON found. Raw text:', text.slice(0, 300));
+        return res.status(500).json({ error: 'No JSON in Gemini response', raw: text.slice(0, 300) });
+      }
+      try {
+        result = JSON.parse(match[0]);
+      } catch (e) {
+        console.error('[analyze] JSON parse failed:', e.message, '| raw:', text.slice(0, 300));
+        return res.status(500).json({ error: 'JSON parse failed: ' + e.message, raw: text.slice(0, 300) });
+      }
     }
 
     if (!result.confidence) result.confidence = 'medium';
