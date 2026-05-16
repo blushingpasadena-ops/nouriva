@@ -407,20 +407,53 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
   <nav class="l-nav">
     <div class="v-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 38" height="28" aria-label="Mivara" style="display:block"><path d="M 19,10 Q 15,19 5,23 Q 15,27 19,36 Q 23,27 33,23 Q 23,19 19,10 Z" fill="#2d8653"/><text x="42" y="30" font-family="'Cormorant Garamond',Georgia,serif" font-size="30" font-weight="400" fill="#0f0f0f" letter-spacing="-0.3">Mivara</text></svg></div>
     <div class="l-nav-btns">
-      <button class="btn-o" onclick="showAuth('login')">Sign in</button>
-      <button class="btn-f" onclick="showAuth('signup')">Start free →</button>
+      <div id="navLoggedOut" style="display:flex;gap:8px">
+        <button class="btn-o" onclick="showAuth('login')">Sign in</button>
+        <button class="btn-f" onclick="showAuth('signup')">Start free →</button>
+      </div>
+      <div id="navLoggedIn" style="display:none;align-items:center;gap:10px">
+        <span style="font-size:13px;color:var(--ink3)" id="navWelcome"></span>
+        <button class="btn-f" onclick="showApp()">Continue to app →</button>
+      </div>
     </div>
   </nav>
-  <div class="hero">
+
+  <!-- Compact hero — the meal uploader IS the CTA -->
+  <div class="hero" style="padding:48px 32px 16px">
     <div class="eyebrow">✦ Built for your lab results</div>
     <h1 class="hero-h">Every meal tells a story.<br/><em>Mivara listens.</em></h1>
-    <p class="hero-p">No food scales, no macro spreadsheets, no barcode scanning. Just snap a photo of whatever you're eating — home cooked, takeout, grandma's recipe — and get the full nutritional picture in seconds.</p>
-    <div class="hero-btns">
-      <button class="btn-hero-p" onclick="showAuth('signup')">Start free trial</button>
-      <button class="btn-hero-s" onclick="document.getElementById('demo-anchor').scrollIntoView({behavior:'smooth'})">Try meal analysis ↓</button>
-    </div>
-    <p class="hero-note">14-day free trial · credit card required · $9.99/mo after · cancel anytime</p>
+    <p class="hero-p" style="margin-bottom:0">No food scales, no macro spreadsheets, no barcode scanning. Just snap a photo of whatever you're eating — home cooked, takeout, grandma's recipe — and get the full nutritional picture in seconds.</p>
   </div>
+
+  <!-- MEAL ANALYZER — primary above-fold feature, immediately usable -->
+  <div id="demo-anchor" class="demo-wrap" style="padding-top:20px;padding-bottom:20px">
+    <div class="demo-card">
+      <div class="upload-z" id="landingZone" style="padding:52px 20px;border-width:2.5px">
+        <input type="file" accept="image/*" onchange="runLandingAnalysis(this)"/>
+        <div class="u-icon" style="font-size:44px;margin-bottom:14px">📸</div>
+        <div class="u-title" style="font-size:16px;margin-bottom:8px">Snap a photo of your meal</div>
+        <div class="u-sub">Made for real food — home cooked, culturally rich, and full of flavor</div>
+      </div>
+      <div class="ana-bar" id="landingAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">AI is analyzing your meal…</span></div>
+      <div class="meal-out" id="landingOut">
+        <img id="landingImg" class="m-img" src="" alt="meal"/>
+        <div id="landingMacros" class="m-grid"></div>
+        <div id="landingInsights" class="m-insights"></div>
+        <div class="cta-box" id="landingCtaBox">
+          <p id="landingCtaText">Track this + all your habits and meals every day</p>
+          <button id="landingCtaBtn" onclick="showAuth('signup')">Create your free account →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sign-up row — hidden for logged-in users -->
+  <div id="landingSignupRow" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:4px 32px 16px">
+    <button class="btn-hero-p" onclick="showAuth('signup')">Start 14-day free trial</button>
+    <button class="btn-hero-s" onclick="showAuth('login')">Sign in →</button>
+  </div>
+  <p class="hero-note" id="landingSignupNote" style="text-align:center;margin-bottom:36px">14-day free trial · credit card required · $9.99/mo after · cancel anytime</p>
+
   <div class="for-whom">
     <div class="for-card"><div class="for-icon">🧪</div><div class="for-title">Your labs came back flagged</div><div class="for-desc">High LDL, low ferritin, pre-diabetes markers — Mivara translates results into daily habits and foods that actually move the needle.</div></div>
     <div class="for-card"><div class="for-icon">🌿</div><div class="for-title">You want food as medicine</div><div class="for-desc">Snap a photo of any meal — our AI breaks down every macro, flags LDL impact, and ties it to your specific lab concerns.</div></div>
@@ -443,28 +476,6 @@ input:checked+.ob-slider:before{transform:translateX(20px)}
           <div class="pf-stat"><div class="pf-sv">21</div><div class="pf-sl">Best streak</div></div>
           <div class="pf-stat"><div class="pf-sv">38</div><div class="pf-sl">Days active</div></div>
         </div>
-      </div>
-    </div>
-  </div>
-  <div id="demo-anchor" class="demo-wrap">
-    <div style="text-align:center;margin-bottom:20px">
-      <div class="demo-badge">✦ Free preview — try it now</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--ink);margin-bottom:8px;letter-spacing:-.5px">AI Meal Analysis</h2>
-      <p style="font-size:14px;color:var(--ink3);max-width:420px;margin:0 auto;line-height:1.6">Snap or upload any meal photo. Real AI identifies exactly what you're eating and gives you a full nutritional breakdown.</p>
-    </div>
-    <div class="demo-card">
-      <div class="upload-z" id="landingZone">
-        <input type="file" accept="image/*" onchange="runLandingAnalysis(this)"/>
-        <div class="u-icon">📸</div>
-        <div class="u-title">Tap to upload a meal photo</div>
-        <div class="u-sub">Made for real food — home cooked, culturally rich, and full of flavor</div>
-      </div>
-      <div class="ana-bar" id="landingAna"><span class="spin">⏳</span><span style="font-size:13px;color:var(--sage);font-weight:600">AI is analyzing your meal…</span></div>
-      <div class="meal-out" id="landingOut">
-        <img id="landingImg" class="m-img" src="" alt="meal"/>
-        <div id="landingMacros" class="m-grid"></div>
-        <div id="landingInsights" class="m-insights"></div>
-        <div class="cta-box"><p>Track this + all your habits and meals every day</p><button onclick="showAuth('signup')">Create your free account →</button></div>
       </div>
     </div>
   </div>
@@ -905,7 +916,34 @@ const EXERCISES=[
   {id:'climbing',icon:'🧗',label:'Climbing',proto:'Grip strength requires iron — low ferritin directly limits power. Creatine improves short-burst strength. Magnesium for finger tendon health.'},
 ];
 const EX_QUICK_HABITS={tennis:['🎾 Play tennis or hit a wall','🏃 30 min cardio warm-up','💪 Core + shoulder stability'],running:['🏃 Run 30+ min','💪 Strength cross-train 2x/wk','🧘 Post-run stretch 10 min'],cycling:['🚴 Cycle 45+ min','💪 Leg strength training','🏃 Active recovery walk'],swimming:['🏊 Swim 30+ min','💪 Dryland strength training','🧘 Mobility & flexibility'],yoga:['🧘 Yoga 30+ min','🏃 Light cardio 20 min','💪 Bodyweight strength 2x/wk'],weights:['🏋️ Lift weights 45+ min','🏃 Cardio 20 min 3x/wk','🧘 Stretch & recover'],walking:['🚶 Walk 30+ min','💪 Light resistance training','🧘 Evening wind-down walk'],golf:['⛳ Golf round or range','🏃 Walk instead of cart','💪 Rotational strength training'],hiit:['🥊 HIIT session 30 min','🏃 Active recovery walk','💪 Strength 2x/wk'],pilates:['🤸 Pilates 45 min','🏃 Cardio 20 min','🧘 Breathwork 10 min'],surf:['🏄 Surf session','💪 Paddle strength training','🧘 Balance & flexibility'],climbing:['🧗 Climb session','💪 Antagonist training','🤸 Finger tendon warm-up'],};
-function showLanding(){document.getElementById('landing').style.display='';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.remove('on')}
+function showLanding(){
+  document.getElementById('landing').style.display='';
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('on');
+  const lo=document.getElementById('navLoggedOut');
+  const li=document.getElementById('navLoggedIn');
+  const signupRow=document.getElementById('landingSignupRow');
+  const signupNote=document.getElementById('landingSignupNote');
+  if(sbUserId&&S.user){
+    if(lo)lo.style.display='none';
+    if(li){li.style.display='flex';const w=document.getElementById('navWelcome');if(w)w.textContent='Hi, '+S.user.name.split(' ')[0]+' ✦';}
+    if(signupRow)signupRow.style.display='none';
+    if(signupNote)signupNote.style.display='none';
+    const ctaBtn=document.getElementById('landingCtaBtn');
+    const ctaText=document.getElementById('landingCtaText');
+    if(ctaBtn){ctaBtn.textContent='Continue to app →';ctaBtn.onclick=showApp;}
+    if(ctaText)ctaText.textContent='Ready to log this meal and track your habits?';
+  }else{
+    if(lo)lo.style.display='flex';
+    if(li)li.style.display='none';
+    if(signupRow)signupRow.style.display='flex';
+    if(signupNote)signupNote.style.display='';
+    const ctaBtn=document.getElementById('landingCtaBtn');
+    const ctaText=document.getElementById('landingCtaText');
+    if(ctaBtn){ctaBtn.textContent='Create your free account →';ctaBtn.onclick=()=>showAuth('signup');}
+    if(ctaText)ctaText.textContent='Track this + all your habits and meals every day';
+  }
+}
 function showAuth(t){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.remove('hidden');document.getElementById('mainApp').classList.remove('on');switchTab(t||'login')}
 function showApp(){document.getElementById('landing').style.display='none';document.getElementById('authScreen').classList.add('hidden');document.getElementById('mainApp').classList.add('on');initApp();setTimeout(checkFeedbackSurveys,2500);checkIOSInstallPrompt();}
 function switchTab(t){const fg=t==='forgot';document.getElementById('aTabLogin').classList.toggle('on',t==='login');document.getElementById('aTabSignup').classList.toggle('on',t==='signup');document.getElementById('loginForm').classList.toggle('hidden',t!=='login');document.getElementById('signupForm').classList.toggle('hidden',t!=='signup');document.getElementById('forgotForm').classList.toggle('hidden',!fg);document.querySelector('.auth-tabs').style.display=fg?'none':'';document.getElementById('authDivider').style.display=fg?'none':'';document.getElementById('authGuest').style.display=fg?'none':'';if(fg){document.getElementById('forgotEmailWrap').style.display='';document.getElementById('forgotBtn').style.display='';document.getElementById('aSuccess').classList.add('hidden');}document.getElementById('aErr').classList.add('hidden');}
@@ -1560,7 +1598,19 @@ if('serviceWorker' in navigator){
     });
   });
 }
-(async()=>{const hash=new URLSearchParams(window.location.hash.slice(1));if(hash.get('type')==='recovery'){showResetScreen();return;}const{data:{session}}=await sb.auth.getSession();if(session){sbUserId=session.user.id;const name=session.user.user_metadata?.name||session.user.email.split('@')[0];const{data:prof}=await sb.from('profiles').select('*').eq('id',sbUserId).single();applyProfile(prof,name,session.user.email);showApp();}else{showLanding();}})();
+(async()=>{
+  const hash=new URLSearchParams(window.location.hash.slice(1));
+  if(hash.get('type')==='recovery'){showResetScreen();return;}
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    sbUserId=session.user.id;
+    const name=session.user.user_metadata?.name||session.user.email.split('@')[0];
+    const{data:prof}=await sb.from('profiles').select('*').eq('id',sbUserId).single();
+    applyProfile(prof,name,session.user.email);
+  }
+  // Always show landing first — logged-in users see "Continue to app →" in nav
+  showLanding();
+})();
 </script>
 
 </body>
